@@ -14,14 +14,21 @@ import { setUser } from "@/config/redux/reducers/userSlice"
 import { useRouter } from "next/navigation"
 export default function Login() {
     const router = useRouter();
-    const [userNameOrEmail, setUserNameOrEmail] = useState("");
+    const [cnicNo, setCnicNo] = useState("");
     const [password, setPassword] = useState("");
     const dispatch = useDispatch();
     const loginUser = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        const cnicRegex = /^[0-9]{13}$/;
+        if (!cnicRegex.test(cnicNo)) {
+            return toast("Invalid CNIC!", {
+                description: "CNIC must be a 13-digit number.",
+                action: { label: "Ok", onClick: () => console.log("Invalid CNIC") },
+            });
+        }
         try {
             const { data } = await axios.post("/api/v1/login", {
-                userNameOrEmail,
+                cnicNo,
                 password
             })
             console.log(data);
@@ -65,30 +72,24 @@ export default function Login() {
         }
     }
     return (
-        <div className="w-full px-3 h-[90vh] flex justify-center items-center">
+        <div className="w-full px-3 h-[80vh] flex justify-center items-center">
             <Toaster />
             <Card className="mx-auto w-full max-w-[640px]">
                 <CardHeader>
-                    <CardTitle className="text-3xl text-[#1e40af]">Login</CardTitle>
+                    <CardTitle className="text-3xl text-[#0673be]">Login</CardTitle>
                     <CardDescription>Enter your information to Login</CardDescription>
                 </CardHeader>
                 <form onSubmit={loginUser}>
                     <CardContent className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="username-or-email">Username or Email</Label>
-                            <Input id="username-or-email" onChange={(e) => setUserNameOrEmail(e.target.value)} placeholder="shahzaibali" required minLength={3} />
+                            <Label htmlFor="cnic-no">CNIC No</Label>
+                            <Input id="cnic-no" onChange={(e) => setCnicNo(e.target.value)} placeholder="4250112345678" required minLength={13} />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="password">Password</Label>
                             <Input id="password" onChange={(e) => setPassword(e.target.value)} placeholder="password" type="password" required minLength={8} />
                         </div>
-                        <Button type="submit" className="w-full hover:bg-[#3655bd] bg-[#1e40af]">Login</Button>
-                        <div className="flex w-full justify-center gap-x-2 items-center">
-                            <h1>New here?</h1>
-                            <Link href={'/register'}>
-                                <h1 className="cursor-pointer underline text-blue-700">Register now!</h1>
-                            </Link>
-                        </div>
+                        <Button type="submit" className="w-full hover:bg-[#84b642] bg-[#8dc447]">Login</Button>
                     </CardContent>
                 </form>
             </Card>

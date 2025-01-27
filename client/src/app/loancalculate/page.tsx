@@ -17,25 +17,25 @@ interface Category {
 }
 
 type LoanBreakdown = {
-    moneyBorrowed: number;
+    moneyBorrowed: number | null;
     initialDeposit: number;
     loanPeriod: number;
-    monthlyInstallment: number;
+    monthlyInstallment: number | null;
 };
 
 const LoanCalculate = () => {
-    const [categories, setCategories] = useState<Category[]>([]); // Fixed the type
+    const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [loadingVal, setLoadingVal] = useState<number>(33);
     const [selectedCategory, setSelectedCategory] = useState<string>("");
     const [selectedSubCategory, setSelectedSubCategory] = useState<string>("");
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    const [currentCategory, setCurrentCategory] = useState<Category | null>(null); // Fixed type to allow null
-    const [initialDeposit, setInitialDeposit] = useState<string>("");
-    const [loanPeriod, setLoanPeriod] = useState<string>("");
+    const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
+    const [initialDeposit, setInitialDeposit] = useState<number | null>(null);
+    const [loanPeriod, setLoanPeriod] = useState<number | null>(null);
     const [isRegistered, setIsRegistered] = useState(false);
     const [loanBreakdown, setLoanBreakdown] = useState<LoanBreakdown | null>(null);
-    const [amount, setAmount] = useState<number>(0);
+    const [amount, setAmount] = useState<number | null>(null);
     const router = useRouter()
     const [cnic, setCnic] = useState("");
     const [email, setEmail] = useState("");
@@ -53,7 +53,6 @@ const LoanCalculate = () => {
                 action: { label: "Ok", onClick: () => console.log("Invalid CNIC") },
             });
         }
-
         if (!emailRegex.test(email)) {
             return toast("Invalid Email!", {
                 description: "Please enter a valid email address.",
@@ -109,25 +108,25 @@ loanPeriod })
         }
         const selectCategory = categories.find((category) => category.name === selectedCategory);
         console.log(selectedCategory);
-        if (selectCategory && selectCategory.maxLoan !== null && amount > selectCategory.maxLoan) {
+        if (selectCategory && selectCategory.maxLoan !== null && amount && amount > selectCategory.maxLoan) {
             return toast("Amount limit!", {
                 description: `You cannot take a loan of more than ${selectCategory.maxLoan}.`,
                 action: { label: "Ok", onClick: () => console.log("ok") },
             });
         }
-        if (Number(initialDeposit) < 0.1 * amount) {
+        if (amount && Number(initialDeposit) < 0.1 * amount) {
             return toast("Insufficient Deposit!", {
                 description: "You must deposit at least 10% of the amount you want to borrow.",
                 action: { label: "Ok", onClick: () => console.log("Ok clicked") },
             });
         }
-        if (selectCategory && +loanPeriod > selectCategory.loanPeriod * 12) {
+        if (selectCategory && loanPeriod > selectCategory.loanPeriod * 12) {
             return toast("Repayment Period Exceeded!", {
                 description: `The loan period cannot exceed ${selectCategory.loanPeriod * 12} months for this category.`,
                 action: { label: "Ok", onClick: () => console.log("Ok clicked") },
             });
         }
-        setLoanBreakdown({ moneyBorrowed: amount, initialDeposit: +initialDeposit, loanPeriod: +loanPeriod, monthlyInstallment: amount / +loanPeriod });
+        setLoanBreakdown({ moneyBorrowed: amount, initialDeposit: initialDeposit, loanPeriod: loanPeriod, monthlyInstallment: amount && (amount - initialDeposit) / loanPeriod });
     };
 
     return (
@@ -185,7 +184,7 @@ loanPeriod })
                                 >
                                     <option value="">Select a Subcategory</option>
                                     {currentCategory?.subcategories?.map((sub) => (
-                                        <option key={sub._id} value={sub._id}>
+                                        <option key={sub._id} value={sub.name}>
                                             {sub.name}
                                         </option>
                                     ))}
@@ -198,7 +197,7 @@ loanPeriod })
                             <label className="block text-sm font-medium mb-1">Amount</label>
                             <input
                                 type="number"
-                                value={amount}
+                                value={amount ? amount : ""}
                                 onChange={(e) => setAmount(Number(e.target.value))}
                                 placeholder="Enter Loan Amount"
                                 className="w-full px-3 py-2 border rounded-md focus:ring focus:ring-blue-300"
@@ -210,8 +209,8 @@ loanPeriod })
                             <label className="block text-sm font-medium mb-1">Initial Deposit</label>
                             <input
                                 type="number"
-                                value={initialDeposit}
-                                onChange={(e) => setInitialDeposit(e.target.value)}
+                                value={initialDeposit ? initialDeposit : ""}
+                                onChange={(e) => setInitialDeposit(Number(e.target.value))}
                                 placeholder="Enter Initial Deposit"
                                 className="w-full px-3 py-2 border rounded-md focus:ring focus:ring-blue-300"
                             />
@@ -222,8 +221,8 @@ loanPeriod })
                             <label className="block text-sm font-medium mb-1">Loan Period (months)</label>
                             <input
                                 type="number"
-                                value={loanPeriod}
-                                onChange={(e) => setLoanPeriod(e.target.value)}
+                                value={loanPeriod ? loanPeriod : ""}
+                                onChange={(e) => setLoanPeriod(Number(e.target.value))}
                                 placeholder="Enter Loan Period"
                                 className="w-full px-3 py-2 border rounded-md focus:ring focus:ring-blue-300"
                             />
@@ -239,13 +238,13 @@ loanPeriod })
                         </button>
 
                         {/* Loan Breakdown */}
-                        {loanBreakdown && loanBreakdown.moneyBorrowed > 0 && (
+                        {loanBreakdown && loanBreakdown.moneyBorrowed && loanBreakdown.moneyBorrowed > 0 && (
                             <>
                                 <div className="mt-4 p-4 bg-blue-100 text-blue-800 rounded-md">
-                                    <p><strong>Money Borrowed:</strong> {loanBreakdown.moneyBorrowed}</p>
-                                    <p><strong>Initial Deposit:</strong> {loanBreakdown.initialDeposit}</p>
+                                    <p><strong>Money Borrowed:</strong> {loanBreakdown.moneyBorrowed} Pkr</p>
+                                    <p><strong>Initial Deposit:</strong> {loanBreakdown.initialDeposit} Pkr</p>
                                     <p><strong>Loan Period:</strong> {loanBreakdown.loanPeriod} months</p>
-                                    <p><strong>Monthly Installment:</strong> {loanBreakdown.monthlyInstallment}</p>
+                                    <p><strong>Monthly Installment:</strong> {loanBreakdown.monthlyInstallment} Pkr</p>
                                 </div>
                                 <button
                                     type="button"
@@ -276,7 +275,8 @@ loanPeriod })
                             <div>
                                 <label className="block text-sm font-medium mb-1">CNIC</label>
                                 <input
-                                    type="text"
+                                    type="number"
+                                    required
                                     placeholder="Enter your CNIC"
                                     className="w-full px-3 py-2 border rounded-md focus:ring focus:ring-blue-300"
                                     value={cnic}
@@ -288,6 +288,7 @@ loanPeriod })
                                 <label className="block text-sm font-medium mb-1">Email</label>
                                 <input
                                     type="email"
+                                    required
                                     placeholder="Enter your email"
                                     className="w-full px-3 py-2 border rounded-md focus:ring focus:ring-blue-300"
                                     value={email}
@@ -299,6 +300,7 @@ loanPeriod })
                                 <label className="block text-sm font-medium mb-1">Name</label>
                                 <input
                                     type="text"
+                                    required
                                     placeholder="Enter your name"
                                     className="w-full px-3 py-2 border rounded-md focus:ring focus:ring-blue-300"
                                     value={name}

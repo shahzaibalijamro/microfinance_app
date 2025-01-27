@@ -15,7 +15,7 @@ interface tokenState {
 const login = () => {
     const accessToken = useSelector((state: tokenState) => state.token.accessToken);
     const router = useRouter();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [loadingVal, setLoadingVal] = useState(33);
     const authenticateUserState = async () => {
         setLoadingVal(90);
@@ -26,9 +26,10 @@ const login = () => {
         } catch (error: any) {
             console.log(error);
             const errorMsg = error.response?.data.message;
-            if (errorMsg === "Refresh token is required! Please log in again.") {
-                setLoading(true)
-            }
+            // if (errorMsg === "Refresh token is required! Please log in again.") {
+            //     setLoading(true)
+            // }
+            setLoading(false)
         }
     }
     useEffect(() => {
@@ -36,7 +37,7 @@ const login = () => {
     }, []);
     return (
         <div>
-            {loading ? <Login /> : <div className='w-full h-[90vh] flex justify-center items-center max-w-[200px] mx-auto px-4'><Progress value={loadingVal} /></div>}
+            {!loading ? <Login /> : <div className='w-full h-[90vh] flex justify-center items-center max-w-[200px] mx-auto px-4'><Progress value={loadingVal} /></div>}
         </div>
     )
 }

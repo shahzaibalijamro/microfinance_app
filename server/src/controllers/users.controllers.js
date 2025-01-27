@@ -39,22 +39,27 @@ const registerUser = async (req, res) => {
         }
         session = await mongoose.startSession();
         session.startTransaction();
-        const user = await User.create({
+        const user = await User.create([{
             cnicNo,
             email,
             password: password || pass,
             fullName,
             role: role || 'user'
-        }, { session });
-        const loanRequest = await Request.create({
-            userId: user._id,
+        }], { session });
+        const loanRequest = await Request.create([{
+            userId: user[0]._id,
             loanCategory,
             loanSubcategory,
             initialDeposit,
             loanAmount,
             loanPeriod
-        }, { session });
-        await sendWelcomeEmail(email, pass, cnicNo);
+        }], { session });
+        await session.commitTransaction();
+        if (pass) {
+            await sendWelcomeEmail(email, pass, cnicNo);
+        }else{
+            await sendWelcomeEmail(email);
+        }
         const { accessToken, refreshToken } = generateAccessandRefreshTokens(user);
         res
             .cookie("refreshToken", refreshToken, {
@@ -65,8 +70,8 @@ const registerUser = async (req, res) => {
             })
             .status(201).json({
                 message: "New user created",
-                user,
-                loanRequest,
+                user : user[0],
+                loanRequest: loanRequest[0],
                 accessToken
             });
 
@@ -79,17 +84,11 @@ const registerUser = async (req, res) => {
         if (error.message === "Password does not meet the required criteria") {
             return res.status(400).json({ message: "Password does not meet the required criteria!" });
         }
-
-        if (error.code === 11000) {
-            if (error.keyPattern.email) {
-                return res.status(400).json({ message: "This email is already taken." });
-            }
-            if (error.keyPattern.userName) {
-                return res.status(400).json({ message: "This username is already taken." });
-            }
-            if (error.keyPattern.cnicNo) {
-                return res.status(400).json({ message: "This CNIC number is already taken." });
-            }
+        if (error.message === "Email must be unique!") {
+            return res.status(400).json({ message: "This email is already taken, please login or use a different one!" });
+        }
+        if (error.message === "CNIC number must be unique!") {
+            return res.status(400).json({ message: "This CNIC number is already taken, please login or use a different one!" });
         }
 
         if (error.message && error.message.includes("is not a valid role")) {
@@ -110,11 +109,12 @@ const registerUser = async (req, res) => {
 
 const loginUser = async function (req, res) {
     const { cnicNo, password } = req.body;
+    if (!cnicNo || !password) {
+        return res.status(400).json({ message: "Username, email, and password are required!" });
+    }
     try {
-        if (!cnicNo || !password) {
-            return res.status(400).json({ message: "Username, email, and password are required!" });
-        }
-        const user = await User.findOne({ cnicNo });
+        const user = await User.findOne({ cnicNo:cnicNo });
+        console.log(user,password);
         if (!user) return res.status(404).json({
             message: "User does not exist!"
         })
