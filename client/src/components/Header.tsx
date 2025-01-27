@@ -13,7 +13,6 @@ import { setUser } from '@/config/redux/reducers/userSlice'
 import useRemoveUser from '@/hooks/removeUser'
 import { toast } from 'sonner'
 import Image from 'next/image'
-import { Separator } from './ui/separator'
 
 interface tokenState {
     token: {
@@ -24,11 +23,10 @@ interface tokenState {
 interface userState {
     user: {
         user: {
-            userName: string,
+            fullName: string,
             _id: string,
-            profilePicture: {
-                url: string
-            }
+            cnicNo: string,
+            email : string
         },
     }
 }
@@ -41,22 +39,21 @@ const Header = () => {
     const removeUserAndRedirect = useRemoveUser();
     const user = useSelector((state: userState) => state.user.user);
     console.log(user);
-    // const getTokens = async () => {
-    //     try {
-    //         const { data } = await axios.post("/api/v1/auth");
-    //         console.log(data);
-    //         dispatch(setAccessToken({ token: data.accessToken }));
-    //         dispatch(setUser({ user: data.user }));
-    //         setIsLoaded(true)
-    //     } catch (error) {
-    //         console.log(error);
-    //         setIsLoaded(true);
-    //     }
-    // }
+    const getTokens = async () => {
+        try {
+            const { data } = await axios.post("/api/v1/auth");
+            console.log(data);
+            dispatch(setAccessToken({ token: data.accessToken }));
+            dispatch(setUser({ user: data.user }));
+            setIsLoaded(true)
+        } catch (error) {
+            console.log(error);
+            setIsLoaded(true);
+        }
+    }
     useEffect(() => {
         if (!accessToken) {
-            // getTokens();
-            setIsLoaded(true)
+            getTokens();
         }
     }, [])
     const logOutUser = async () => {
@@ -86,21 +83,20 @@ const Header = () => {
             <div className='flex justify-center items-center gap-x-2'>
                 {isLoaded && accessToken && user && <DropdownMenu modal={false}>
                     <DropdownMenuTrigger className='focus-visible:outline-none'><Avatar className='w-9 h-9' >
-                        <AvatarImage src={user.profilePicture.url} alt={`@${user.userName}`} />
-                        <AvatarFallback className='font-medium text-xl'>{user.userName[0]}</AvatarFallback>
+                        <AvatarFallback className='font-medium text-white bg-[#8dc447] text-xl'>{user.fullName[0]}</AvatarFallback>
                     </Avatar></DropdownMenuTrigger>
                     <DropdownMenuContent className='z-50'>
-                        <Link href={`/user/${user.userName}`}>
+                        <Link href={`/user/${user.fullName}`}>
                             <DropdownMenuLabel className='cursor-pointer'>My Profile</DropdownMenuLabel>
                         </Link>
                         <DropdownMenuItem onClick={logOutUser} className='cursor-pointer'>Logout</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>}
-                <Link href="/loancalculate">
+                {isLoaded && !accessToken && <Link href="/loancalculate">
                     <Button className='bg-[#0673be] transition-transform transform hover:scale-110 hover:text-white hover:bg-[#0673be] text-white'>
                         Request a loan
                     </Button>
-                </Link>
+                </Link>}
                 {isLoaded && !accessToken && <Link href="/login">
                     <Button className='bg-[#8dc447] transition-transform transform hover:translate-y-[2px] hover:scale-110 hover:text-white hover:bg-[#8dc447] text-white'>Login</Button>
                 </Link>}
