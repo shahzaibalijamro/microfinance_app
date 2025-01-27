@@ -60,7 +60,8 @@ const LoanCalculate = () => {
                 action: { label: "Ok", onClick: () => console.log("Invalid Email") },
             });
         }
-        const { data } = await axios.post("/api/v1/register", { fullName: name, email, cnicNo: cnic })
+        const { data } = await axios.post("/api/v1/register", { fullName: name, email, cnicNo: cnic,loanCategory:selectedCategory,loanSubcategory:selectedSubCategory,initialDeposit,loanAmount:amount,
+loanPeriod })
         console.log(data);
         console.log({ cnic, email, name });
         setIsModalOpen(false);
