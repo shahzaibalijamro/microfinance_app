@@ -4,6 +4,9 @@ import axios from "@/config/axiosConfig";
 import { Progress } from "@/components/ui/progress";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 // Define types for categories and subcategories
 interface Category {
@@ -31,8 +34,10 @@ const LoanCalculate = () => {
     const [currentCategory, setCurrentCategory] = useState<Category | null>(null); // Fixed type to allow null
     const [initialDeposit, setInitialDeposit] = useState<string>("");
     const [loanPeriod, setLoanPeriod] = useState<string>("");
+    const [isRegistered, setIsRegistered] = useState(true);
     const [loanBreakdown, setLoanBreakdown] = useState<LoanBreakdown | null>(null);
     const [amount, setAmount] = useState<number>(0);
+    const router = useRouter()
     const [cnic, setCnic] = useState("");
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
@@ -42,7 +47,7 @@ const LoanCalculate = () => {
     const handleSubmit = async (e: any) => {
         e.preventDefault();
         const cnicRegex = /^[0-9]{13}$/;
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailRegex = /^[^\s@]+@(gmail\.com|yahoo\.com|outlook\.com)$/i;
         if (!cnicRegex.test(cnic)) {
             return toast("Invalid CNIC!", {
                 description: "CNIC must be a 13-digit number.",
@@ -60,6 +65,9 @@ const LoanCalculate = () => {
         console.log(data);
         console.log({ cnic, email, name });
         setIsModalOpen(false);
+        setTimeout(() => {
+            setIsRegistered(true);
+        }, 200)
     };
 
     const getAllCategories = async () => {
@@ -129,6 +137,27 @@ const LoanCalculate = () => {
                 <div className="w-full h-[80vh] flex justify-center items-center my-4">
                     <Progress className='w-48' value={loadingVal} />
                 </div>
+            ) : isRegistered ? (
+                <Dialog open={isRegistered}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle className="mb-[6px]">Loan Request Received!</DialogTitle>
+                            <DialogDescription>
+                                Your loan request has been received successfully. An email has been sent to <strong>{email}</strong> containing your login credentials. Please log in using the provided details to complete the next steps, including submitting additional information and scheduling your appointment.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="mt-0 flex justify-end">
+                            <Button
+                                variant="default"
+                                onClick={() => {
+                                    router.push("/")
+                                }}
+                            >
+                                Home
+                            </Button>
+                        </div>
+                    </DialogContent>
+                </Dialog>
             ) : (
                 <div className="w-full">
                     <div className="bg-white mx-auto p-6 rounded-lg shadow-lg max-w-lg w-full">

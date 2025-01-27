@@ -50,11 +50,12 @@ const Header = () => {
     //         setIsLoaded(true);
     //     }
     // }
-    // useEffect(() => {
-    //     if (!accessToken) {
-    //         getTokens();
-    //     }
-    // }, [])
+    useEffect(() => {
+        if (!accessToken) {
+            // getTokens();
+            setIsLoaded(true)
+        }
+    }, [])
     const logOutUser = async () => {
         try {
             const { data } = await axios.post("/api/v1/logout");
@@ -92,8 +93,8 @@ const Header = () => {
                         <DropdownMenuItem onClick={logOutUser} className='cursor-pointer'>Logout</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>}
-                {isLoaded && !accessToken && <Link href="/register">
-                    <Button className='bg-white transition hover:translate-y-[2px] hover:text-black hover:bg-white text-black'>Signup</Button>
+                {isLoaded && !accessToken && <Link href="/login">
+                    <Button className='bg-white transition hover:translate-y-[2px] hover:text-black hover:bg-white text-black'>Login</Button>
                 </Link>}
             </div>
         </div>

@@ -1,55 +1,81 @@
 import mongoose from "mongoose";
 import User from "../models/user.models.js";
-// import Post from "../models/post.models.js";
-// import Comment from "../models/comment.models.js"
 import jwt from "jsonwebtoken"
+import Request from "../models/loanRequest.models.js"
 import bcrypt from "bcrypt"
 import { generateAccessandRefreshTokens } from "../utils/token.utils.js";
-// import { deleteImageFromCloudinary, uploadImageToCloudinary } from "../utils/cloudinary.utils.js";
 import { sendWelcomeEmail } from "../utils/nodemailer.utils.js";
 import { generateRandomPassword } from "../utils/password.utils.js";
 
 // // registers User
 const registerUser = async (req, res) => {
-    const { fullName, email, password, role,cnicNo } = req.body;
-
+    const {
+        fullName,
+        email,
+        password,
+        role,
+        cnicNo,
+        loanCategory,
+        loanSubcategory,
+        initialDeposit,
+        loanAmount,
+        loanPeriod
+    } = req.body;
     if (!cnicNo || !email || !fullName) {
         return res.status(401).json({
             message: "Required fields not met!"
         });
     }
-
+    if (!loanCategory || !loanSubcategory || !initialDeposit || !loanAmount || !loanPeriod) {
+        return res.status(401).json({
+            message: "Required fields not met for loan request!"
+        });
+    }
+    let session;
     try {
         let pass;
         if (!password) {
             pass = generateRandomPassword();
         }
+        session = await mongoose.startSession();
+        session.startTransaction();
         const user = await User.create({
             cnicNo,
             email,
-            password : password || pass,
+            password: password || pass,
             fullName,
             role: role || 'user'
-        });
-        await sendWelcomeEmail(email,pass,cnicNo);
+        }, { session });
+        const loanRequest = await Request.create({
+            userId: user._id,
+            loanCategory,
+            loanSubcategory,
+            initialDeposit,
+            loanAmount,
+            loanPeriod
+        }, { session });
+        await sendWelcomeEmail(email, pass, cnicNo);
         const { accessToken, refreshToken } = generateAccessandRefreshTokens(user);
-        
         res
-            .cookie("refreshToken", refreshToken, { 
-                httpOnly: true, 
-                secure: process.env.STATUS === "development" ? false : true, 
-                sameSite: process.env.STATUS === "development" ? 'Lax' : 'None', 
-                maxAge: 24 * 60 * 60 * 1000 
+            .cookie("refreshToken", refreshToken, {
+                httpOnly: true,
+                secure: process.env.STATUS === "development" ? false : true,
+                sameSite: process.env.STATUS === "development" ? 'Lax' : 'None',
+                maxAge: 24 * 60 * 60 * 1000
             })
             .status(201).json({
                 message: "New user created",
                 user,
+                loanRequest,
                 accessToken
             });
 
     } catch (error) {
         console.log(error);
-
+        //update the frontend error response
+        if (session) {
+            await session.abortTransaction();
+        }
         if (error.message === "Password does not meet the required criteria") {
             return res.status(400).json({ message: "Password does not meet the required criteria!" });
         }
@@ -69,12 +95,16 @@ const registerUser = async (req, res) => {
         if (error.message && error.message.includes("is not a valid role")) {
             return res.status(400).json({ message: "Invalid role. It must be 'user' or 'admin'." });
         }
-        
+
         if (error.name === 'ValidationError') {
             return res.status(400).json({ message: error.message });
         }
 
         res.status(500).json({ message: 'Server error' });
+    }finally{
+        if (session) {
+            session.endSession();
+        }
     }
 };
 
@@ -84,7 +114,7 @@ const loginUser = async function (req, res) {
         if (!cnicNo || !password) {
             return res.status(400).json({ message: "Username, email, and password are required!" });
         }
-        const user = await User.findOne({cnicNo});
+        const user = await User.findOne({ cnicNo });
         if (!user) return res.status(404).json({
             message: "User does not exist!"
         })
@@ -154,4 +184,4 @@ const loginUser = async function (req, res) {
 // };
 
 
-export { registerUser,loginUser }
+export { registerUser, loginUser }
