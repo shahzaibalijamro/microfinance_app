@@ -6,6 +6,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import { Provider } from "react-redux";
 import store from "@/config/redux/store/store";
+import { Separator } from "@/components/ui/separator";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,6 +32,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#f2f4f7]`}>
         <Provider store={store}>
           <Header />
+          <Separator className="h-[2px]"/>
           {children}
         </Provider>
       </body>
