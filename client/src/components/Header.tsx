@@ -83,7 +83,7 @@ const Header = () => {
     return (
         <div className='w-full flex justify-between px-3 py-3 sm:px-4 sm:py-4 md:px-4 md:py-4 items-center lg:py-3 lg:px-4 xl:px-5 xl:py-3'>
             <Link href={"/"}>
-                <Image src={SaylaniIcon} alt='saylani-icon' />
+                <Image src={SaylaniIcon} priority alt='saylani-icon' />
             </Link>
             <div className='flex justify-center items-center gap-x-2'>
                 {isLoaded && accessToken && user && <DropdownMenu modal={false}>
