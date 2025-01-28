@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import useRemoveUser from "@/hooks/removeUser";
 import { setLoanSlice } from "@/config/redux/reducers/loanSlice";
 import { setLoadingState } from "@/config/redux/reducers/loadingSlice";
+import { setUser } from "@/config/redux/reducers/userSlice";
 
 // TypeScript Interfaces
 interface UserState {
@@ -51,18 +52,31 @@ interface SubCategory {
     name: string;
     _id: string;
 }
-
+interface LoanDetails {
+    _id: string;
+    userId: string;
+    loanCategory: string;
+    loanSubcategory: string;
+    initialDeposit: number;
+    loanAmount: number;
+    loanPeriod: number; // in months
+    status: string;
+    createdAt: string; // ISO date string
+    updatedAt: string; // ISO date string
+    guarantors: Array<string>; // Assuming it's an array of guarantor IDs
+    __v: number;
+  }
+  
 // Component
 const Page = ({ params, }: { params: Promise<{ id: string }> }) => {
+    const isLoading = useSelector((state: isLoading) => state.isLoading.isLoading);
     const accessToken = useSelector(
         (state: TokenState) => state.token.accessToken
     );
-    const [isPasswordChanged, setIsPasswordChanged] = useState(true);
     const user = useSelector((state: UserState) => state.user.user);
-    console.log(user, "===>");
-    const isLoading = useSelector((state: isLoading) => state.isLoading.isLoading);
-    console.log(isLoading);
-    const [password, setPassword] = useState<string>("")
+    const [isPasswordChanged, setIsPasswordChanged] = useState(true);
+    const [password, setPassword] = useState<string>("");
+    const [loanDetails,setLoanDetails] = useState<LoanDetails | null>(null)
     const [id, setId] = useState<string>("");
     const [loadingVal, setLoadingVal] = useState(33);
     const [doesUserExist, setDoesUserExist] = useState(true);
@@ -73,22 +87,17 @@ const Page = ({ params, }: { params: Promise<{ id: string }> }) => {
     const removeUserAndRedirect = useRemoveUser();
     const router = useRouter();
     useEffect(() => {
-        (async () => {
+        if (user._id && accessToken) {
             setLoadingVal(90);
-            const resolvedParams = await params;
-            setId(resolvedParams.id);
-            dispatch(setLoadingState({ loading: false }));
-        })();
-    }, [params, accessToken]);
-    useEffect(() => {
-        checkIsPasswordChanged();
-    }, [user])
-    const goToLoanCalculator = (subcategory: SubCategory) => {
-        dispatch(setLoanSlice({ loanData: { category: currentCategory?.name, subCategory: subcategory.name } }));
-        router.push(`/loancalculate`);
-    }
+            checkIsPasswordChanged();
+        }
+    }, [user, accessToken])
     const checkIsPasswordChanged = async () => {
         setIsPasswordChanged(user.isPasswordChanged);
+        if (user.isPasswordChanged) {
+            getCurrentLoanRequest();
+        }
+        dispatch(setLoadingState({ loading: false }));
     }
     const updatePassword = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()
@@ -100,27 +109,42 @@ const Page = ({ params, }: { params: Promise<{ id: string }> }) => {
             });
         }
         try {
-            const {data} = await axios.patch("/api/v1/register",{
+            const { data } = await axios.patch("/api/v1/register", {
                 cnicNo: user.cnicNo,
                 password
             }, {
                 headers: {
-                    'Authorization' : `Bearer ${accessToken}`
+                    'Authorization': `Bearer ${accessToken}`
                 }
             })
             console.log(data);
+            setIsPasswordChanged(data.isPasswordChanged);
+            dispatch(setUser({ user: data }));
+            return toast("Password updated!", {
+                description: `Your password has been updated successfully, you can use this password to login next time.`,
+                action: { label: "Ok", onClick: () => console.log("Ok clicked") },
+            });
         } catch (error) {
             console.log(error);
         }
     }
+    const getCurrentLoanRequest = async () => {
+        const { data } = await axios("/api/v1/loan", {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        })
+        console.log(data);
+        setLoanDetails(data);
+    }
     return (
         <>
-            <Toaster/>
+            <Toaster />
             {isLoading ? (
                 <div className="max-w-[200px] h-[80vh] mx-auto px-4 justify-center items-center mt-4 flex">
                     <Progress value={loadingVal} />
                 </div>
-            ) : !isPasswordChanged ? (
+            ) : !isPasswordChanged && !isLoading ? (
                 <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
                         <div className="mb-1">
@@ -157,39 +181,39 @@ const Page = ({ params, }: { params: Promise<{ id: string }> }) => {
                         </div>
                     </div>
                 </div>
-            ) : (
-                <div className="max-w-[1200px] px-3 w-full mx-auto">
-                    <div className="h-6 w-full"></div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {currentCategory?.subcategories && currentCategory?.subcategories?.length > 0 ? (
-                            currentCategory.subcategories.map((subcategory: SubCategory) => (
-                                <div
-                                    key={subcategory._id}
-                                    className="border rounded-lg p-6 shadow-md hover:shadow-xl transition-all duration-200 ease-in-out transform hover:scale-95 flex flex-col justify-between bg-white"
-                                >
-                                    <div className="flex flex-col justify-between h-full">
-                                        <h2 className="text-2xl font-semibold mb-2 text-gray-800">
-                                            {subcategory.name}
-                                        </h2>
-                                        <button
-                                            className="mt-4 py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                                            onClick={() => goToLoanCalculator(subcategory)}
-                                        >
-                                            Proceed
-                                        </button>
-                                    </div>
-                                </div>
-                            ))
-                        ) : (
-                            <div className="flex justify-center items-center my-4">
-                                <h1 className="text-lg font-semibold text-gray-600">
-                                    No categories found!
-                                </h1>
-                            </div>
-                        )}
+            ) : loanDetails ? (
+                <div className="w-full bg-white shadow-md rounded-lg p-6 flex flex-col sm:flex-row items-center gap-4 border max-w-[1200px] mx-auto mt-6">
+                    {/* Left Section */}
+                    <div className="flex-1">
+                        <h2 className="text-xl font-semibold text-gray-800 mb-2">Loan Category</h2>
+                        <p className="text-lg text-gray-600">{loanDetails.loanCategory}</p>
+                        <h2 className="text-xl font-semibold text-gray-800 mt-4 mb-2">Loan Subcategory</h2>
+                        <p className="text-lg text-gray-600">{loanDetails.loanSubcategory}</p>
+                    </div>
+
+                    {/* Center Section */}
+                    <div className="flex-1">
+                        <h2 className="text-xl font-semibold text-gray-800 mb-2">Loan Amount</h2>
+                        <p className="text-lg text-gray-600">{loanDetails.loanAmount.toLocaleString()} PKR</p>
+                        <h2 className="text-xl font-semibold text-gray-800 mt-4 mb-2">Initial Deposit</h2>
+                        <p className="text-lg text-gray-600">{loanDetails.initialDeposit.toLocaleString()} PKR</p>
+                        <h2 className="text-xl font-semibold text-gray-800 mt-4 mb-2">Loan Period</h2>
+                        <p className="text-lg text-gray-600">{loanDetails.loanPeriod} months</p>
+                    </div>
+
+                    {/* Right Section */}
+                    <div className="flex-1">
+                        <h2 className="text-xl font-semibold text-gray-800 mb-2">Status</h2>
+                        <p className={`text-lg font-medium ${loanDetails.status === "Pending" ? "text-yellow-600" : "text-green-600"}`}>
+                            {loanDetails.status}
+                        </p>
+                        <h2 className="text-xl font-semibold text-gray-800 mt-4 mb-2">Created At</h2>
+                        <p className="text-lg text-gray-600">{new Date(loanDetails.createdAt).toLocaleDateString()}</p>
                     </div>
                 </div>
-            )}
+            ) : <>
+            <h1>Hello</h1>
+            </>}
         </>
     );
 };
