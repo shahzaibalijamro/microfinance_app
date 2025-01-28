@@ -13,6 +13,8 @@ import { setUser } from '@/config/redux/reducers/userSlice'
 import useRemoveUser from '@/hooks/removeUser'
 import { toast } from 'sonner'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { setLoadingState } from '@/config/redux/reducers/loadingSlice'
 
 interface tokenState {
     token: {
@@ -26,7 +28,7 @@ interface userState {
             fullName: string,
             _id: string,
             cnicNo: string,
-            email : string
+            email: string
         },
     }
 }
@@ -36,6 +38,7 @@ const Header = () => {
     const [isLoaded, setIsLoaded] = useState(false);
     const accessToken = useSelector((state: tokenState) => state.token.accessToken);
     console.log(accessToken, "accessToken Before");
+    const router = useRouter();
     const removeUserAndRedirect = useRemoveUser();
     const user = useSelector((state: userState) => state.user.user);
     console.log(user);
@@ -43,12 +46,14 @@ const Header = () => {
         try {
             const { data } = await axios.post("/api/v1/auth");
             console.log(data);
+            router.replace(`/dashboard/${data.user.fullName}`)
             dispatch(setAccessToken({ token: data.accessToken }));
             dispatch(setUser({ user: data.user }));
             setIsLoaded(true)
         } catch (error) {
             console.log(error);
             setIsLoaded(true);
+            dispatch(setLoadingState({ loading: false }));
         }
     }
     useEffect(() => {

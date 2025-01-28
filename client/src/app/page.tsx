@@ -7,10 +7,16 @@ import Head from 'next/head';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { setCategoriesInRedux } from '@/config/redux/reducers/categorySlice';
+import { setLoadingState } from '@/config/redux/reducers/loadingSlice';
 
 interface tokenState {
   token: {
     accessToken: string,
+  }
+}
+interface isLoading {
+  isLoading: {
+    isLoading: boolean,
   }
 }
 interface userState {
@@ -41,6 +47,8 @@ interface Category {
 const Home = () => {
   const accessToken = useSelector((state: tokenState) => state.token.accessToken);
   const user = useSelector((state: userState) => state.user.user);
+  const isLoading = useSelector((state: isLoading) => state.isLoading.isLoading);
+  console.log(isLoading);
   const [loading, setLoading] = useState(true);
   const [textInput, setTextInput] = useState("");
   const [commentText, setCommentText] = useState("");
@@ -53,10 +61,9 @@ const Home = () => {
   const getAllCategories = async (page = 1) => {
     setCategories([]);
     setLoading(true)
-    setLoadingVal(80);
+    setLoadingVal(50);
     try {
       const { data } = await axios.get("/api/v1/categories");
-      setLoadingVal(90);
       console.log(data);
       setCategories(data);
       dispatch(setCategoriesInRedux(data));
@@ -79,7 +86,7 @@ const Home = () => {
     <>
       <div className="h-6 w-full"></div>
       {/* Loading Spinner */}
-      {loading ? (
+      {isLoading ? (
         <div className="w-full h-[80vh] flex justify-center items-center my-4">
           <Progress className='w-48' value={loadingVal} />
         </div>
