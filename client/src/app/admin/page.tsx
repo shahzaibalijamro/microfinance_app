@@ -1,13 +1,11 @@
 "use client"
-
-import React, { FormEvent, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import axios from "@/config/axiosConfig"
 import { useDispatch, useSelector } from 'react-redux';
 import LoanDetailsCard from '@/components/LoanDetailsCard';
 import { setAppointmentInRedux } from '@/config/redux/reducers/appointmentSlice';
 import Loader from '@/components/Loader';
 import ViewMoreModal from '@/components/ViewMoreModal';
-import EditLoanRequestModal from '@/components/EditLoanRequestModal';
 import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/sonner';
 interface TokenState {

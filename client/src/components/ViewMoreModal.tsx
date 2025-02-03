@@ -1,10 +1,9 @@
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Button } from './ui/button';
 import close from "@/assets/close.png"
 import { DatePicker } from './DatePicker';
 import TimePicker from './TimePicker';
-import { useSelector } from 'react-redux';
 import TokenSlip from './TokenSlip';
 interface ViewMoreModal {
     setIsviewMoreModalOpen: (value: boolean) => void;
@@ -104,6 +103,71 @@ const ViewMoreModal = ({ setIsviewMoreModalOpen, loading, appointmentLocation, d
                         </h2>
                         <form onSubmit={() => setIsviewMoreModalOpen(false)}>
                             <div className="mb-6">
+                                <h3 className="text-lg font-semibold mb-3">Loan Details</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label htmlFor="salarySheet" className="block text-sm font-medium mb-2">
+                                            Loan Category
+                                        </label>
+                                        <input
+                                            defaultValue={request.loanCategory}
+                                            type="text"
+                                            readOnly
+                                            placeholder="Loan Category"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="salarySheet" className="block text-sm font-medium mb-2">
+                                            Loan Subcategory
+                                        </label>
+                                        <input
+                                            defaultValue={request.loanSubcategory}
+                                            type="text"
+                                            readOnly
+                                            placeholder="Loan Subcategory"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="salarySheet" className="block text-sm font-medium mb-2">
+                                            Loan Amount
+                                        </label>
+                                        <input
+                                            defaultValue={request.loanAmount}
+                                            type="text"
+                                            readOnly
+                                            placeholder="Loan Amount"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="salarySheet" className="block text-sm font-medium mb-2">
+                                            Initial Deposit
+                                        </label>
+                                        <input
+                                            defaultValue={request.initialDeposit}
+                                            type="text"
+                                            readOnly
+                                            placeholder="Initial Deposit"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="salarySheet" className="block text-sm font-medium mb-2">
+                                            Loan Period (Months)
+                                        </label>
+                                        <input
+                                            defaultValue={request.loanPeriod}
+                                            type="text"
+                                            readOnly
+                                            placeholder="Loan Period (Months)"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mb-6">
                                 <h3 className="text-lg font-semibold mb-3">Personal Information</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <input
@@ -114,6 +178,7 @@ const ViewMoreModal = ({ setIsviewMoreModalOpen, loading, appointmentLocation, d
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
                                     />
                                     <input
+                                        readOnly
                                         defaultValue={request.userId.mobileNo}
                                         type="number"
                                         placeholder="Phone Number"
@@ -126,24 +191,28 @@ const ViewMoreModal = ({ setIsviewMoreModalOpen, loading, appointmentLocation, d
                                 <div className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <input
+                                        readOnly
                                             defaultValue={request.guarantors[0].name}
                                             type="text"
                                             placeholder="Guarantor 1 Name"
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
                                         />
                                         <input
+                                        readOnly
                                             defaultValue={request.guarantors[0].email}
                                             type="email"
                                             placeholder="Guarantor 1 Email"
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
                                         />
                                         <input
+                                        readOnly
                                             defaultValue={request.guarantors[0].location}
                                             type="text"
                                             placeholder="Guarantor 1 Location"
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
                                         />
                                         <input
+                                        readOnly
                                             defaultValue={request.guarantors[0].cnic}
                                             type="number"
                                             placeholder="Guarantor 1 CNIC"
@@ -152,24 +221,28 @@ const ViewMoreModal = ({ setIsviewMoreModalOpen, loading, appointmentLocation, d
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <input
+                                        readOnly
                                             defaultValue={request.guarantors[1].name}
                                             type="text"
                                             placeholder="Guarantor 2 Name"
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
                                         />
                                         <input
+                                        readOnly
                                             defaultValue={request.guarantors[1].email}
                                             type="email"
                                             placeholder="Guarantor 2 Email"
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
                                         />
                                         <input
+                                        readOnly
                                             defaultValue={request.guarantors[1].location}
                                             type="text"
                                             placeholder="Guarantor 2 Location"
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
                                         />
                                         <input
+                                        readOnly
                                             required
                                             defaultValue={request.guarantors[1].cnic}
                                             type="text"
