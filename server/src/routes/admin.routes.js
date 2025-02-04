@@ -1,5 +1,5 @@
 import express from "express"
-import { addCategory, approveOrDisapproveRequest, filterRequestsByStatus, getAllLoanRequests } from "../controllers/admin.controllers.js";
+import { addCategory, approveOrDisapproveRequest, filterRequestsByCnic, filterRequestsByStatus, getAllLoanRequests } from "../controllers/admin.controllers.js";
 import { checkIfAdmin } from "../middlewares/auth.middlewares.js";
 
 const adminRouter = express.Router();
@@ -12,5 +12,6 @@ adminRouter.get("/requests",checkIfAdmin, getAllLoanRequests)
 adminRouter.put("/approve",checkIfAdmin, approveOrDisapproveRequest)
 //filtering
 adminRouter.get("/filter/:status",checkIfAdmin, filterRequestsByStatus)
+adminRouter.get("/search/:cnic",checkIfAdmin, filterRequestsByCnic)
 
 export { adminRouter }

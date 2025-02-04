@@ -103,10 +103,21 @@ const page = () => {
         }
     }
     const debouncedSearch = useCallback(
-        debounce((cnic: string) => {
+        debounce(async(cnic: string) => {
+            if (cnic.length < 6) return;
             console.log('Searching for:', cnic);
-        }, 500),
-        []
+            try {
+                const {data} = await axios.get(`/api/v1/search/${cnic}`,{
+                    headers:{
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                })
+                console.log(data);
+            } catch (error) {
+                console.log(error);
+            }
+        }, 700),
+        [accessToken]
     );
     const searchByCnicNumber = async (event: ChangeEvent<HTMLInputElement>) => {
         const searchInput = event.target.value;
@@ -204,11 +215,11 @@ const page = () => {
                     <input
                         value={cnicNumber}
                         onChange={searchByCnicNumber}
-                        className='p-3 rounded-md w-full focus-visible:outline-slate-300'
+                        className='px-3 py-2 border-slate-200 border rounded-md w-full focus-visible:outline-slate-300'
                         type="number"
                         placeholder='Search by token number'
                     />
-                    <div className='sm:max-w-[300px] max-w-full top-[5px] relative w-full'>
+                    <div className='sm:max-w-[300px] max-w-full top-[2px] relative w-full'>
                         <select
                             onChange={filterByStatus}
                             className="px-3 focus-visible:outline-none w-full py-2 border rounded-md focus:ring focus:ring-slate-300"

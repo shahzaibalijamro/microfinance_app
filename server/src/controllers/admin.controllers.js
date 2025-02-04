@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Category from "../models/categorySchema.models.js";
 import Request from "../models/loanRequest.models.js";
+import User from "../models/user.models.js";
 import Appointment from "../models/appointment.models.js";
 import { notifyUser } from "../utils/nodemailer.utils.js";
 
@@ -110,11 +111,8 @@ const filterRequestsByStatus = async (req,res) => {
 const filterRequestsByCnic = async (req,res) => {
     const {cnic} = req.params;
     try {
-        const requests = await Request.find({status}).sort({ createdAt: -1 }).populate([{ path: 'userId', select: '-password -role -isPasswordChanged' }]);
-        if (requests.length === 0) return res.status(200).json({
-            message: "You're all caught up!"
-        })
-        return res.status(200).json(requests);
+        const request = await User.find({ cnicNo: { $regex: `^${cnic}`, $options: "i" } });
+        return res.status(200).json(request);
     } catch (error) {
         console.log(error);
         return res.status(500).json({
@@ -122,4 +120,4 @@ const filterRequestsByCnic = async (req,res) => {
         })
     }
 }
-export { addCategory, getAllLoanRequests, approveOrDisapproveRequest,filterRequestsByStatus }
+export { addCategory, getAllLoanRequests, approveOrDisapproveRequest,filterRequestsByStatus,filterRequestsByCnic }
