@@ -55,6 +55,7 @@ const page = () => {
     const accessToken = useSelector(
         (state: TokenState) => state.token.accessToken
     );
+    const [cnicNumber, setCnicNumber] = useState("")
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
     const [mobileNo, setMobileNo] = useState("");
     const [g1Name, setG1Name] = useState("");
@@ -94,16 +95,48 @@ const page = () => {
             setLoadingVal(99)
             setLoanRequests(data);
             console.log(data);
-        setIsLoading(false);
+            setIsLoading(false);
         } catch (error) {
             console.log(error);
         }
     }
-    const searchByTokenNumber = async (event:ChangeEvent<HTMLInputElement>) => {
-        console.log(event.target.value);
+    const debouncedSearch = useCallback(
+        debounce((searchTerm) => {
+            // Replace with your API call
+            console.log('Searching for:', searchTerm);
+            // fetchData(searchTerm);
+        }, 300),
+        [] // Add dependencies if needed (e.g., API credentials)
+    );
+    const searchByCnicNumber = async (event: ChangeEvent<HTMLInputElement>) => {
+        const searchInput = event.target.value;
+        setCnicNumber(searchInput)
     }
-    const filterByStatus = async (event:ChangeEvent<HTMLSelectElement>) => {
-        console.log(event.target.value);
+    const filterByStatus = async (event: ChangeEvent<HTMLSelectElement>) => {
+        const status = event.target.value;
+        console.log(status);
+
+        try {
+            if (status === "All requests") {
+                return await getAllLoanRequests()
+            }
+            const { data } = await axios(`/api/v1/filter/${status}`, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            })
+            console.log(data);
+            if (data.message === "You're all caught up!") {
+                await getAllLoanRequests();
+                return toast("No such requests found!", {
+                    description: `No such requests found in the database!`,
+                    action: { label: "Ok", onClick: () => console.log("Ok clicked") },
+                });
+            }
+            setLoanRequests(data);
+        } catch (error) {
+            console.log(error);
+        }
     }
     const handleViewMoreModal = async (userId: string, index: number) => {
         console.log(userId);
@@ -158,34 +191,45 @@ const page = () => {
     }
     return (
         <div className='mx-3'>
-            <div className="w-full bg-white shadow-md rounded-lg p-3 flex gap-4 border max-w-[1200px] relative mx-auto mt-6">
-                <input onChange={searchByTokenNumber} className='p-3 rounded-md w-full focus-visible:outline-slate-300' type="number" placeholder='Search by token number' name="" id="" />
-                <div className='max-w-[300px] top-[5px] relative w-full'>
-                    <select
-                    onChange={filterByStatus}
-                        className="px-3 focus-visible:outline-none w-full py-2 border rounded-md focus:ring focus:ring-slate-300"
-                    >
-                        <option value="">Filter by</option>
-                        <option value={'Approved'}>
-                            Approved
-                        </option>
-                        <option value={'Rejected'}>
-                            Rejected
-                        </option>
-                        <option value={'Under Review'}>
-                        Under Review
-                        </option>
-                    </select>
-                </div>
-            </div>
             <Toaster />
-            {loanRequests.length > 0 ? loanRequests.map((request, index) => {
-                return <div key={request._id}>
-                    <LoanDetailsCard request={request} index={index} handleViewMoreModal={handleViewMoreModal} approveOrDisapproveRequest={approveOrDisapproveRequest} setIsEditModalOpen={setIsEditModalOpen} />
-                    {isviewMoreModalOpen &&
-                        <ViewMoreModal appointmentLocation={appointmentLocation} date={date} loading={loading} selectedTime={selectedTime} setIsviewMoreModalOpen={setIsviewMoreModalOpen} request={request} />}
+            {loanRequests.length > 0 ? <>
+                <div className="w-full bg-white shadow-md rounded-lg p-3 flex flex-col sm:flex-row gap-2 border max-w-[1200px] relative mx-auto mt-6">
+                    <input
+                        value={cnicNumber}
+                        onChange={searchByCnicNumber}
+                        className='p-3 rounded-md w-full focus-visible:outline-slate-300'
+                        type="number"
+                        placeholder='Search by token number'
+                    />
+                    <div className='sm:max-w-[300px] max-w-full top-[5px] relative w-full'>
+                        <select
+                            onChange={filterByStatus}
+                            className="px-3 focus-visible:outline-none w-full py-2 border rounded-md focus:ring focus:ring-slate-300"
+                        >
+                            <option value="All requests">All requests</option>
+                            <option value={'Approved'}>
+                                Approved
+                            </option>
+                            <option value={'Rejected'}>
+                                Rejected
+                            </option>
+                            <option value={'Under Review'}>
+                                Under Review
+                            </option>
+                            <option value={'Documents Pending'}>
+                                Documents Pending
+                            </option>
+                        </select>
+                    </div>
                 </div>
-            }) : <Loader loadingVal={loadingVal} />}
+                {loanRequests.map((request, index) => {
+                    return <div key={request._id}>
+                        <LoanDetailsCard request={request} index={index} handleViewMoreModal={handleViewMoreModal} approveOrDisapproveRequest={approveOrDisapproveRequest} setIsEditModalOpen={setIsEditModalOpen} />
+                        {isviewMoreModalOpen &&
+                            <ViewMoreModal appointmentLocation={appointmentLocation} date={date} loading={loading} selectedTime={selectedTime} setIsviewMoreModalOpen={setIsviewMoreModalOpen} request={request} />}
+                    </div>
+                })}
+            </> : <Loader loadingVal={loadingVal} />}
         </div>
     )
 }

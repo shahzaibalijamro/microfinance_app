@@ -92,7 +92,7 @@ const LoanDetailsCard = ({ loanDetails, request, handleViewMoreModal, setIsModal
                     <div className="flex-1 text-center">
                         <div>
                             <h2 className="text-xl font-semibold text-gray-800 mb-2">Mobile No</h2>
-                            <p className="text-lg text-gray-600">{request.userId.mobileNo}</p>
+                            <p className="text-lg text-gray-600">{request.userId.mobileNo || "Not provided yet"}</p>
                         </div>
                     </div>
                     <div className="flex-1 text-center">

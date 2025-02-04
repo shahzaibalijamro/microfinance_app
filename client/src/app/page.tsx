@@ -92,7 +92,7 @@ const Home = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {categories.length > 0 ? (
                 categories.map((category: Category) => (
-                  <CategoryCard category={category} goToSubCategory={goToSubCategory} />
+                  <CategoryCard key={category._id} category={category} goToSubCategory={goToSubCategory} />
                 ))
               ) : (
                 <div className="flex justify-center items-center my-4">

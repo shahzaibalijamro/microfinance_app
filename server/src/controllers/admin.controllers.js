@@ -87,4 +87,23 @@ const approveOrDisapproveRequest = async (req, res) => {
         })
     }
 }
-export { addCategory, getAllLoanRequests, approveOrDisapproveRequest }
+
+const filterRequestsByStatus = async (req,res) => {
+    const {status} = req.params;
+    const page = req.query?.page || 1;
+    const limit = req.query?.limit || 10;
+    const skip = (+page - 1) * +limit;
+    try {
+        const requests = await Request.find({status}).sort({ createdAt: -1 }).skip(skip).limit(limit).populate([{ path: 'userId', select: '-password -role -isPasswordChanged' }]);
+        if (requests.length === 0) return res.status(200).json({
+            message: "You're all caught up!"
+        })
+        return res.status(200).json(requests);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Something went wrong!"
+        })
+    }
+}
+export { addCategory, getAllLoanRequests, approveOrDisapproveRequest,filterRequestsByStatus }
