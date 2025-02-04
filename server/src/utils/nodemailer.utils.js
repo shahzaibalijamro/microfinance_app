@@ -28,8 +28,15 @@ const notifyUser = async (userEmail, appointmentDate, appointmentTime, location,
             : `
                 <h1>Loan Request Update</h1>
                 <p>We regret to inform you that your loan request has been rejected.</p>
+                <p>Possible reasons for rejection may include:</p>
+                <ul>
+                    <li>The provided guarantors did not meet the required eligibility criteria.</li>
+                    <li>The submitted documents (salary sheet, bank statement, etc.) did not meet verification standards.</li>
+                    <li>Your loan request did not fulfill our financial assessment criteria.</li>
+                </ul>
                 <p>If you have any questions or need further clarification, please visit our office or contact support.</p>
                 <p>Thank you for considering our services.</p>
+
             `;
 
     const mailOptions = {
@@ -77,4 +84,4 @@ const sendWelcomeEmail = async (userEmail, password, cnic) => {
     await transporter.sendMail(mailOptions);
 };
 
-export {sendWelcomeEmail,notifyUser}
+export { sendWelcomeEmail, notifyUser }

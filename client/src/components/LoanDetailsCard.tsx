@@ -153,7 +153,11 @@ const LoanDetailsCard = ({ loanDetails, request, handleViewMoreModal, setIsModal
                     <div className="flex-1 h-full sm:text-end text-center flex flex-col justify-between">
                         <div>
                             <h2 className="text-xl font-semibold text-gray-800 mb-1">Status</h2>
-                            <p className={`text-lg font-medium ${loanDetails.status === "Documents Pending" ? "text-yellow-600" : "text-green-600"}`}>
+                            <p 
+                            className={`text-lg font-medium 
+                            ${loanDetails.status === "Documents Pending" ? "text-yellow-600" : 
+                                loanDetails.status === "Rejected" ? 
+                            "text-red-600" : "text-green-600"}`}>
                                 {loanDetails.status}
                             </p>
                         </div>
@@ -168,10 +172,16 @@ const LoanDetailsCard = ({ loanDetails, request, handleViewMoreModal, setIsModal
                     <button onClick={() => handleViewMoreModal("", 0)} className="mt-auto w-full bg-[#0971c0] text-white py-2 px-4 rounded-lg hover:bg-[#0971c0d9] transition-all">
                         View full request
                     </button>
-                    <button onClick={() => setIsEditModalOpen(true)} className="mt-auto w-full bg-[#0971c0] text-white py-2 px-4 rounded-lg hover:bg-[#0971c0d9] transition-all">
+                    {loanDetails.status === "Under Review" && <button onClick={() => setIsEditModalOpen(true)} className="mt-auto w-full bg-[#0971c0] text-white py-2 px-4 rounded-lg hover:bg-[#0971c0d9] transition-all">
                         Edit request
-                    </button>
+                    </button>}
                 </div>}
+                {loanDetails?.status === "Rejected" && <h1 className='text-center'>
+                    Your loan request has been rejected. Please check the email we sent for more details.
+                    </h1>}
+                {loanDetails?.status === "Approved" && <h1 className='text-center'>
+                    Your loan request has been Approved. Please check the email we sent for more details.
+                    </h1>}
             </div>}
         </>
     )

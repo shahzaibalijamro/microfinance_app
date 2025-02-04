@@ -4,12 +4,12 @@ import { LoadingSpinner } from './LoadingSpinner';
 interface RegisterModal {
     setIsModalOpen: (value: boolean) => void;
     handleSubmit: (e: FormEvent<HTMLFormElement>) => void;
-    cnic: string; 
-    setCnic: (value:string) => void;
+    cnic: string;
+    setCnic: (value: string) => void;
     email: string;
-    setEmail: (value:string) => void;
+    setEmail: (value: string) => void;
     name: string
-    setName: (value:string) => void;
+    setName: (value: string) => void;
     isLoading: boolean
 }
 
@@ -70,13 +70,14 @@ const RegisterModal = ({
                     </div>
                     <button
                         type="submit"
-                        className="w-full py-2 px-4 bg-[#8dc447] text-white font-medium rounded-md hover:bg-[#87b848] transition"
+                        className={`w-full text-center py-2 px-4 bg-[#8dc447] text-white font-medium rounded-md hover:bg-[#87b848] transition ${isLoading ? 'cursor-not-allowed' : ''}`}
+                        disabled={isLoading}
                     >
-                        {isLoading ? <LoadingSpinner/> : "Submit"}
-                    </button>
-                </form>
-            </div>
+                    {isLoading ? <LoadingSpinner className='mx-auto' /> : "Submit"}
+                </button>
+            </form>
         </div>
+        </div >
     )
 }
 

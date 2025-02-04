@@ -258,7 +258,7 @@ const AddGuarantorModal = ({
                             type="submit"
                             className="w-full bg-[#0673be] text-white py-2 px-4 rounded-md hover:bg-[#0673be] focus:ring focus:ring-blue-300"
                         >
-                            {loading ? <LoadingSpinner/> : "Submit Details"}
+                            {loading ? <LoadingSpinner className='text-center'/> : "Submit Details"}
                         </Button>
                     </form>
                 </div>

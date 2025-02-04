@@ -64,16 +64,38 @@ const LoanCalculate = () => {
                 action: { label: "Ok", onClick: () => console.log("Invalid Email") },
             });
         }
-        const { data } = await axios.post("/api/v1/register", {
-            fullName: name, email, cnicNo: cnic, loanCategory: selectedCategory, loanSubcategory: selectedSubCategory, initialDeposit, loanAmount: amount,
-            loanPeriod
-        })
-        setIsLoading(false);
-        console.log(data);
-        setIsModalOpen(false);
-        setTimeout(() => {
-            setIsRegistered(true);
-        }, 200)
+        try {
+            const { data } = await axios.post("/api/v1/register", {
+                fullName: name, email, cnicNo: cnic, loanCategory: selectedCategory, loanSubcategory: selectedSubCategory, initialDeposit, loanAmount: amount,
+                loanPeriod
+            })
+            console.log(data);
+            setIsModalOpen(false);
+            setTimeout(() => {
+                setIsRegistered(true);
+            }, 200)
+        } catch (error: any) {
+            console.log(error);
+            const errorMsg = error.response?.data?.message;
+            if (errorMsg === "This CNIC number is already taken, please login or use a different one!") {
+                return toast("Invalid CNIC!", {
+                    description: "The provided CNIC is already in use. Please log in or use a different one.",
+                    action: { label: "Ok", onClick: () => console.log("Ok clicked") },
+                });
+            }
+            if (errorMsg === "This email is already taken, please login or use a different one!") {
+                return toast("Invalid Email!", {
+                    description: "The provided email is already in use. Please log in or use a different one.",
+                    action: { label: "Ok", onClick: () => console.log("Ok clicked") },
+                });
+            }
+            toast("Something Went Wrong!", {
+                description: "An unexpected error occurred. Please try again later.",
+                action: { label: "Ok", onClick: () => console.log("Ok clicked") },
+            });      
+        }finally{
+            setIsLoading(false);
+        }
     };
     const getAllCategories = async () => {
         setLoading(true);
@@ -96,7 +118,6 @@ const LoanCalculate = () => {
         );
         setCurrentCategory(selectedCategoryObject || null);
     };
-
     const calculateLoanBreakdown = () => {
         if (!selectedCategory || !selectedSubCategory || !initialDeposit || !loanPeriod) {
             return toast("Please fill in all fields", {
@@ -118,13 +139,19 @@ const LoanCalculate = () => {
                 action: { label: "Ok", onClick: () => console.log("ok") },
             });
         }
-        if (amount && Number(initialDeposit) < 0.1 * amount) {
+        if (amount && (initialDeposit > amount || initialDeposit === amount)) {
+            return toast("Invalid Initial Deposit!", {
+                description: "The initial deposit cannot exceed or equal the loan amount. Please enter a valid deposit (at least 10% of the loan amount).",
+                action: { label: "Ok", onClick: () => console.log("Ok clicked") },
+            });
+        }
+        if (amount && (initialDeposit < 0.1 * amount)) {
             return toast("Insufficient Deposit!", {
                 description: "You must deposit at least 10% of the amount you want to borrow.",
                 action: { label: "Ok", onClick: () => console.log("Ok clicked") },
             });
         }
-        if (selectCategory && loanPeriod > selectCategory.loanPeriod * 12) {
+        if (selectCategory && (loanPeriod > selectCategory.loanPeriod * 12)) {
             return toast("Repayment Period Exceeded!", {
                 description: `The loan period cannot exceed ${selectCategory.loanPeriod * 12} months for this category.`,
                 action: { label: "Ok", onClick: () => console.log("Ok clicked") },
@@ -132,17 +159,16 @@ const LoanCalculate = () => {
         }
         setLoanBreakdown({ moneyBorrowed: amount, initialDeposit: initialDeposit, loanPeriod: loanPeriod, monthlyInstallment: amount && (amount - initialDeposit) / loanPeriod });
     };
-
     return (
         <div className="mt-8 flex justify-center items-center bg-gray-100">
             <Toaster />
-            {loading ? 
-            <Loader loadingVal={loadingVal} />
-            : isRegistered ? 
-            <ConfirmationModal email={email} /> : 
-            <LoanCalculatorForm amount={amount} calculateLoanBreakdown={calculateLoanBreakdown} categories={categories} currentCategory={currentCategory} handleCategoryChange={handleCategoryChange} initialDeposit={initialDeposit} loanBreakdown={loanBreakdown} loanPeriod={loanPeriod} selectedCategory={selectedCategory} selectedSubCategory={selectedSubCategory} setAmount={setAmount} setInitialDeposit={setInitialDeposit} setIsModalOpen={setIsModalOpen} setLoanPeriod={setLoanPeriod} setSelectedSubCategory={setSelectedSubCategory}/>}
-            {isModalOpen && 
-            <RegisterModal cnic={cnic} email={email} handleSubmit={handleSubmit} isLoading={isLoading} name={name} setCnic={setCnic} setEmail={setEmail} setIsModalOpen={setIsModalOpen} setName={setName}/>}
+            {loading ?
+                <Loader loadingVal={loadingVal} />
+                : isRegistered ?
+                    <ConfirmationModal email={email} /> :
+                    <LoanCalculatorForm amount={amount} calculateLoanBreakdown={calculateLoanBreakdown} categories={categories} currentCategory={currentCategory} handleCategoryChange={handleCategoryChange} initialDeposit={initialDeposit} loanBreakdown={loanBreakdown} loanPeriod={loanPeriod} selectedCategory={selectedCategory} selectedSubCategory={selectedSubCategory} setAmount={setAmount} setInitialDeposit={setInitialDeposit} setIsModalOpen={setIsModalOpen} setLoanPeriod={setLoanPeriod} setSelectedSubCategory={setSelectedSubCategory} />}
+            {isModalOpen &&
+                <RegisterModal cnic={cnic} email={email} handleSubmit={handleSubmit} isLoading={isLoading} name={name} setCnic={setCnic} setEmail={setEmail} setIsModalOpen={setIsModalOpen} setName={setName} />}
         </div>
     );
 };
