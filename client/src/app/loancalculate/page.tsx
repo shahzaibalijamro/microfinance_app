@@ -8,6 +8,7 @@ import Loader from "@/components/Loader";
 import ConfirmationModal from "@/components/ConfirmationModal";
 import LoanCalculatorForm from "@/components/LoanCalculatorForm";
 import RegisterModal from "@/components/RegisterModal";
+import { useSelector } from "react-redux";
 
 // Typescript interfaces
 interface Category {
@@ -23,8 +24,17 @@ type LoanBreakdown = {
     loanPeriod: number;
     monthlyInstallment: number | null;
 };
-
+interface SelectedData {
+    loanSlice: {
+        loanSlice: {
+            category: string;
+            subCategory: string
+        }
+    }
+}
 const LoanCalculate = () => {
+    const selectedData = useSelector((state: SelectedData) => state.loanSlice.loanSlice);
+    console.log(selectedData);
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [loadingVal, setLoadingVal] = useState<number>(33);
@@ -92,11 +102,29 @@ const LoanCalculate = () => {
             toast("Something Went Wrong!", {
                 description: "An unexpected error occurred. Please try again later.",
                 action: { label: "Ok", onClick: () => console.log("Ok clicked") },
-            });      
-        }finally{
+            });
+        } finally {
             setIsLoading(false);
         }
     };
+    useEffect(() => {
+        if (selectedData && categories.length > 0) {
+            console.log("UESE");
+            
+            const selectedOption = selectedData.category;
+            setSelectedCategory(selectedOption);
+            setSelectedSubCategory(selectedData.subCategory);
+            console.log(categories);
+            console.log(selectedOption);
+            
+            const selectedCategoryObject = categories.find(
+                (category) => category.name === selectedOption
+            );
+            console.log(selectedCategory);
+            
+            setCurrentCategory(selectedCategoryObject || null);
+        }
+    }, [selectedData,categories])
     const getAllCategories = async () => {
         setLoading(true);
         setLoadingVal(80);
@@ -110,7 +138,7 @@ const LoanCalculate = () => {
         }
     };
     const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedOption = e.target.value;
+        const selectedOption = e.target.value || selectedData.category;
         setSelectedCategory(selectedOption);
         setSelectedSubCategory("");
         const selectedCategoryObject = categories.find(
