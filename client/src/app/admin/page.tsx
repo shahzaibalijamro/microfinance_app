@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useRef, useState } from 'react'
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
 import axios from "@/config/axiosConfig"
 import { useDispatch, useSelector } from 'react-redux';
 import LoanDetailsCard from '@/components/LoanDetailsCard';
@@ -78,7 +78,6 @@ const page = () => {
     const [address, setAddress] = useState("");
     const bankStatement = useRef<HTMLInputElement>(null);
     const dispatch = useDispatch();
-
     useEffect(() => {
         if (accessToken) {
             getAllLoanRequests()
@@ -95,10 +94,16 @@ const page = () => {
             setLoadingVal(99)
             setLoanRequests(data);
             console.log(data);
-            setIsLoading(false);
+        setIsLoading(false);
         } catch (error) {
             console.log(error);
         }
+    }
+    const searchByTokenNumber = async (event:ChangeEvent<HTMLInputElement>) => {
+        console.log(event.target.value);
+    }
+    const filterByStatus = async (event:ChangeEvent<HTMLSelectElement>) => {
+        console.log(event.target.value);
     }
     const handleViewMoreModal = async (userId: string, index: number) => {
         console.log(userId);
@@ -124,9 +129,9 @@ const page = () => {
             console.log(error);
         }
     }
-    const approveOrDisapproveRequest = async (request: LoanApplication, text: string,index: number) => {
+    const approveOrDisapproveRequest = async (request: LoanApplication, text: string, index: number) => {
         try {
-            const { data } = await axios.put(`/api/v1/approve`,{request,text},{
+            const { data } = await axios.put(`/api/v1/approve`, { request, text }, {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`
                 }
@@ -136,7 +141,7 @@ const page = () => {
                     description: `Request has been approved, the requester will be notified through email!`,
                     action: { label: "Ok", onClick: () => console.log("Ok clicked") },
                 });
-            }else{
+            } else {
                 toast("Request Rejected!", {
                     description: `Request has been rejected, the requester will be notified through email!`,
                     action: { label: "Ok", onClick: () => console.log("Ok clicked") },
@@ -153,7 +158,27 @@ const page = () => {
     }
     return (
         <div className='mx-3'>
-            <Toaster/>
+            <div className="w-full bg-white shadow-md rounded-lg p-3 flex gap-4 border max-w-[1200px] relative mx-auto mt-6">
+                <input onChange={searchByTokenNumber} className='p-3 rounded-md w-full focus-visible:outline-slate-300' type="number" placeholder='Search by token number' name="" id="" />
+                <div className='max-w-[300px] top-[5px] relative w-full'>
+                    <select
+                    onChange={filterByStatus}
+                        className="px-3 focus-visible:outline-none w-full py-2 border rounded-md focus:ring focus:ring-slate-300"
+                    >
+                        <option value="">Filter by</option>
+                        <option value={'Approved'}>
+                            Approved
+                        </option>
+                        <option value={'Rejected'}>
+                            Rejected
+                        </option>
+                        <option value={'Under Review'}>
+                        Under Review
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <Toaster />
             {loanRequests.length > 0 ? loanRequests.map((request, index) => {
                 return <div key={request._id}>
                     <LoanDetailsCard request={request} index={index} handleViewMoreModal={handleViewMoreModal} approveOrDisapproveRequest={approveOrDisapproveRequest} setIsEditModalOpen={setIsEditModalOpen} />

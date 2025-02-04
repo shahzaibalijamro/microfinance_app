@@ -58,6 +58,9 @@ const loanRequestSchema = new mongoose.Schema({
         url: {
             type: String,
         }
+    },
+    appointment: {
+        type: mongoose.Schema.Types.ObjectId
     }
 }, { timestamps: true });
 

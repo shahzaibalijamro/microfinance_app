@@ -64,14 +64,6 @@ const updateLoanRequest = async (req, res) => {
         session.startTransaction();
 
         try {
-            // Update Loan Request
-            loanRequest.set({
-                guarantors,
-                bankStatement: { url: bankStatement.url, public_id: bankStatement.public_id },
-                salarySheet: { url: salarySheet.url, public_id: salarySheet.public_id },
-                status: "Under Review",
-            });
-
             // Create Appointment
             const appointment = await Appointment.create([{
                 userId: user._id,
@@ -81,6 +73,17 @@ const updateLoanRequest = async (req, res) => {
                 appointmentDay,
                 location,
             }], { session });
+
+
+            // Update Loan Request
+            loanRequest.set({
+                guarantors,
+                bankStatement: { url: bankStatement.url, public_id: bankStatement.public_id },
+                salarySheet: { url: salarySheet.url, public_id: salarySheet.public_id },
+                status: "Under Review",
+                appointment: appointment[0]._id
+            });
+
 
             // Update User
             const theUser = await User.findByIdAndUpdate(
