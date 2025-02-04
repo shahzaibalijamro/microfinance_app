@@ -1,5 +1,5 @@
 "use client"
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
+import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react'
 import axios from "@/config/axiosConfig"
 import { useDispatch, useSelector } from 'react-redux';
 import LoanDetailsCard from '@/components/LoanDetailsCard';
@@ -8,6 +8,7 @@ import Loader from '@/components/Loader';
 import ViewMoreModal from '@/components/ViewMoreModal';
 import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/sonner';
+import { debounce } from 'lodash';
 interface TokenState {
     token: {
         accessToken: string;
@@ -101,17 +102,21 @@ const page = () => {
         }
     }
     const debouncedSearch = useCallback(
-        debounce((searchTerm) => {
-            // Replace with your API call
+        debounce((searchTerm: string) => {
             console.log('Searching for:', searchTerm);
-            // fetchData(searchTerm);
-        }, 300),
-        [] // Add dependencies if needed (e.g., API credentials)
+        }, 500),
+        []
     );
     const searchByCnicNumber = async (event: ChangeEvent<HTMLInputElement>) => {
         const searchInput = event.target.value;
         setCnicNumber(searchInput)
+        debouncedSearch(searchInput);
     }
+    useEffect(() => {
+        return () => {
+            debouncedSearch.cancel();
+        };
+    }, [debouncedSearch]);
     const filterByStatus = async (event: ChangeEvent<HTMLSelectElement>) => {
         const status = event.target.value;
         console.log(status);

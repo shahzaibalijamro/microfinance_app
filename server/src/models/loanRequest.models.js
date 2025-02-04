@@ -60,7 +60,8 @@ const loanRequestSchema = new mongoose.Schema({
         }
     },
     appointment: {
-        type: mongoose.Schema.Types.ObjectId
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Appointment'
     }
 }, { timestamps: true });
 

@@ -54,6 +54,10 @@ const userSchema = new mongoose.Schema({
     mobileNo: {
         type: String,
     },
+    loanRequest: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'LoanRequest'
+    }
 }, { timestamps: true })
 
 userSchema.pre("save", async function (next) {

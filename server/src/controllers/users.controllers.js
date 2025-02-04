@@ -54,6 +54,11 @@ const registerUser = async (req, res) => {
             loanAmount,
             loanPeriod
         }], { session });
+        await User.updateOne(
+            { _id: user[0]._id },
+            { loanRequest: loanRequest[0]._id },
+            { session }
+        );
         await session.commitTransaction();
         if (pass) {
             await sendWelcomeEmail(email, pass, cnicNo);
