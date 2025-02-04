@@ -24,14 +24,11 @@ const getCurrentLoanRequest = async (req, res) => {
 
 const updateLoanRequest = async (req, res) => {
     try {
-        // Destructure parameters
         const { requestId } = req.params;
         const user = req.user;
         const { address, mobileNo, appointmentTime, appointmentDay, location } = req.body;
         let { guarantors } = req.body;
         guarantors = JSON.parse(guarantors);
-
-        // Validate required fields
         if (!requestId) return res.status(400).json({ message: "Loan request ID is required!" });
         if (!req.files?.salarySheet || !req.files?.bankStatement) {
             return res.status(400).json({ message: "Both Salary Sheet and Bank Statement are required." });
@@ -39,15 +36,11 @@ const updateLoanRequest = async (req, res) => {
         if (!address || !mobileNo || !guarantors) {
             return res.status(400).json({ message: "Address, Mobile no, and Guarantors data is required!" });
         }
-
-        // Fetch loan request
         const loanRequest = await Request.findById(requestId);
         if (!loanRequest) return res.status(404).json({ message: "Loan request not found!" });
         if (loanRequest.userId.toString() !== user._id) {
             return res.status(401).json({ message: "Unauthorized to update this loan request!" });
         }
-
-        // Upload files in parallel
         const [salarySheet, bankStatement] = await Promise.all([
             uploadImageToCloudinary(req.files["salarySheet"][0].buffer),
             uploadImageToCloudinary(req.files["bankStatement"][0].buffer),
@@ -56,15 +49,11 @@ const updateLoanRequest = async (req, res) => {
         if (!salarySheet || !bankStatement) {
             return res.status(500).json({ message: "Could not upload media!" });
         }
-
-        // Generate Token Number
         const tokenNumber = await Request.countDocuments({ status: "Documents Pending" });
-        // Update Loan Request, Appointment & User in parallel using Transactions
         const session = await mongoose.startSession();
         session.startTransaction();
 
         try {
-            // Create Appointment
             const appointment = await Appointment.create([{
                 userId: user._id,
                 tokenNumber,
@@ -73,9 +62,6 @@ const updateLoanRequest = async (req, res) => {
                 appointmentDay,
                 location,
             }], { session });
-
-
-            // Update Loan Request
             loanRequest.set({
                 guarantors,
                 bankStatement: { url: bankStatement.url, public_id: bankStatement.public_id },
@@ -83,16 +69,11 @@ const updateLoanRequest = async (req, res) => {
                 status: "Under Review",
                 appointment: appointment[0]._id
             });
-
-
-            // Update User
             const theUser = await User.findByIdAndUpdate(
                 user._id,
                 { address, mobileNo },
                 { new: true, session }
             );
-
-            // Save changes & commit transaction
             await loanRequest.save({ session });
             await session.commitTransaction();
             session.endSession();
@@ -155,11 +136,6 @@ const editLoanRequest = async (req, res) => {
         }
         loanRequest.status = "Under Review";
         const updateFields = {};
-        console.log(address, "address");
-        console.log(mobileNo, "mobileNo");
-        console.log(guarantors, "guarantors");
-        console.log(bankStatement, "bankStatement");
-        console.log(salarySheet, "salarySheet");
         if (address) updateFields.address = address;
         if (mobileNo) updateFields.mobileNo = mobileNo;
         const theUser = await User.findByIdAndUpdate(

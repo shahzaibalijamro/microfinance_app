@@ -5,6 +5,7 @@ import close from "@/assets/close.png"
 import { DatePicker } from './DatePicker';
 import TimePicker from './TimePicker';
 import TokenSlip from './TokenSlip';
+
 interface ViewMoreModal {
     setIsviewMoreModalOpen: (value: boolean) => void;
     user?: {
@@ -23,10 +24,10 @@ interface ViewMoreModal {
         loanSubcategory: string;
         initialDeposit: number;
         loanAmount: number;
-        loanPeriod: number; // in months
+        loanPeriod: number;
         status: string;
-        createdAt: string; // ISO date string
-        updatedAt: string; // ISO date string
+        createdAt: string;
+        updatedAt: string;
         guarantors: Guarantors[];
         salarySheet: {
             url: string;
@@ -252,7 +253,6 @@ const ViewMoreModal = ({ setIsviewMoreModalOpen, loading, appointmentLocation, d
                                     </div>
                                 </div>
                             </div>
-                            {/* Statement and Salary Sheet Section */}
                             <div className="mb-6">
                                 <h3 className="text-lg font-semibold mb-3">Statement and Salary Sheet</h3>
                                 <div className="flex w-full justify-around items-stretch">
@@ -269,7 +269,6 @@ const ViewMoreModal = ({ setIsviewMoreModalOpen, loading, appointmentLocation, d
                                         <Image src={request?.bankStatement?.url} alt="Bank Statement" width={100} height={100} />
                                     </div>
                                 </div>
-                                {/* Salary Sheet Input */}
                             </div>
                             {!loading && <div className="mb-4">
                                 <h3 className="text-lg font-semibold mb-3">Appointment</h3>
@@ -293,7 +292,6 @@ const ViewMoreModal = ({ setIsviewMoreModalOpen, loading, appointmentLocation, d
                                     Show Recieved Slip
                                 </Button>
                             </div>
-                            {/* Submit Button */}
                             <Button
                                 type="submit"
                                 className="w-full bg-[#0673be] text-white py-2 px-4 rounded-md hover:bg-[#0673be] focus:ring focus:ring-blue-300"
@@ -389,7 +387,6 @@ const ViewMoreModal = ({ setIsviewMoreModalOpen, loading, appointmentLocation, d
                                     </div>
                                 </div>
                             </div>
-                            {/* Statement and Salary Sheet Section */}
                             <div className="mb-6">
                                 <h3 className="text-lg font-semibold mb-3">Statement and Salary Sheet</h3>
                                 <div className="flex w-full justify-around items-stretch">
@@ -406,7 +403,6 @@ const ViewMoreModal = ({ setIsviewMoreModalOpen, loading, appointmentLocation, d
                                         <Image src={loanDetails ? loanDetails?.bankStatement.url : ""} alt="Bank Statement" width={100} height={100} />
                                     </div>
                                 </div>
-                                {/* Salary Sheet Input */}
                             </div>
                             {!loading && <div className="mb-4">
                                 <h3 className="text-lg font-semibold mb-3">Appointment</h3>
@@ -430,7 +426,6 @@ const ViewMoreModal = ({ setIsviewMoreModalOpen, loading, appointmentLocation, d
                                     Show Recieved Slip
                                 </Button>
                             </div>
-                            {/* Submit Button */}
                             <Button
                                 type="submit"
                                 className="w-full bg-[#0673be] text-white py-2 px-4 rounded-md hover:bg-[#0673be] focus:ring focus:ring-blue-300"

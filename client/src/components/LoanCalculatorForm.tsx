@@ -1,5 +1,4 @@
 import React from 'react'
-import { useSelector } from 'react-redux';
 
 interface LoanCalculatorForm {
     selectedCategory: string;

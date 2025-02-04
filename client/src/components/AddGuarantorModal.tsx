@@ -1,9 +1,8 @@
 import Image from 'next/image';
-import React, { ChangeEvent, ChangeEventHandler, FormEvent, RefObject } from 'react'
+import React, { ChangeEvent, FormEvent, RefObject } from 'react'
 import { Button } from './ui/button';
 import close from "@/assets/close.png"
 import { DatePicker } from './DatePicker';
-import { Input } from './ui/input';
 import TimePicker from './TimePicker';
 import { LoadingSpinner } from './LoadingSpinner';
 interface AddGuarantorModal {
@@ -51,8 +50,6 @@ const AddGuarantorModal = ({
     selectedTime,
     date,
     setDate,
-    hour,
-    setHour,
     setMobileNo,
     setG1Name,
     setG2Name,
@@ -191,11 +188,8 @@ const AddGuarantorModal = ({
                                 </div>
                             </div>
                         </div>
-                        {/* Statement and Salary Sheet Section */}
                         <div className="mb-6">
                             <h3 className="text-lg font-semibold mb-3">Statement and Salary Sheet</h3>
-
-                            {/* Salary Sheet Input */}
                             <div className="mb-4">
                                 <label htmlFor="salarySheet" className="block text-sm font-medium mb-2">
                                     Upload Salary Sheet
@@ -210,8 +204,6 @@ const AddGuarantorModal = ({
                                 />
                                 <p className="text-sm text-gray-500 mt-1">Upload your latest salary slip or salary certificate (PDF, DOC, JPG, PNG).</p>
                             </div>
-
-                            {/* Bank Statement Input */}
                             <div className="mb-4">
                                 <label htmlFor="bankStatement" className="block text-sm font-medium mb-2">
                                     Upload Bank Statement
@@ -229,10 +221,7 @@ const AddGuarantorModal = ({
                         </div>
                         <div className="mb-6">
                             <h3 className="text-lg font-semibold mb-3">Setup Appointment</h3>
-
-                            {/* Salary Sheet Input */}
                             <DatePicker editAble={true} update={false} date={date} setDate={setDate} />
-                            {/* Bank Statement Input */}
                             <TimePicker editAble={true} update={false} selectedTime={selectedTime} setSelectedTime={setSelectedTime} />
                             <div className="mb-4">
                                 <label htmlFor="calender" className="block text-sm font-medium mb-2">
@@ -253,7 +242,6 @@ const AddGuarantorModal = ({
                                 </select>
                             </div>
                         </div>
-                        {/* Submit Button */}
                         <Button
                             type="submit"
                             className="w-full bg-[#0673be] text-white py-2 px-4 rounded-md hover:bg-[#0673be] focus:ring focus:ring-blue-300"

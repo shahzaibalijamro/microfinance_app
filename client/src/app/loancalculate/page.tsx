@@ -3,7 +3,6 @@ import React, { FormEvent, useEffect, useState } from "react";
 import axios from "@/config/axiosConfig";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 import Loader from "@/components/Loader";
 import ConfirmationModal from "@/components/ConfirmationModal";
 import LoanCalculatorForm from "@/components/LoanCalculatorForm";
@@ -32,8 +31,16 @@ interface SelectedData {
         }
     }
 }
+interface CategoryRedux {
+    categories: {
+        categories: [
+            Category
+        ];
+    }
+}
 const LoanCalculate = () => {
     const selectedData = useSelector((state: SelectedData) => state.loanSlice.loanSlice);
+    const categoriesInRedux = useSelector((state:CategoryRedux) => state.categories.categories)
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [loadingVal, setLoadingVal] = useState<number>(33);
@@ -51,7 +58,12 @@ const LoanCalculate = () => {
     const [name, setName] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
-        getAllCategories();
+        if (categoriesInRedux.length > 0) {
+            setCategories(categoriesInRedux)
+            setLoading(false)
+        }else{
+            getAllCategories();
+        }
     }, []);
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();

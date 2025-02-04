@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
 import QRCode from 'react-qr-code';
 import html2canvas from 'html2canvas';
 import { Button } from './ui/button';
 import { useSelector } from 'react-redux';
 import Image from 'next/image';
 import close from "@/assets/close.png"
+
 interface Appointment {
     _id: string;
     appointmentDay: string;

@@ -1,6 +1,5 @@
 import express from "express"
 import { registerUser,loginUser, updateUserPassword} from "../controllers/users.controllers.js";
-// import { upload } from "../middlewares/multer.middlewares.js";
 import { verifyRequest } from "../middlewares/auth.middlewares.js";
 const userRouter = express.Router();
 

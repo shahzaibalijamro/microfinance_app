@@ -1,7 +1,6 @@
-import Image from 'next/image';
-import React, { FormEvent, RefObject } from 'react'
+
+import React, { FormEvent } from 'react'
 import { Button } from './ui/button';
-import close from "@/assets/close.png"
 import { LoadingSpinner } from './LoadingSpinner';
 interface UpdatePasswordModal {
     updatePassword: (event: FormEvent<HTMLFormElement>) => void;

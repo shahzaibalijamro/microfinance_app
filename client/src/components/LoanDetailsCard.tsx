@@ -14,10 +14,10 @@ interface LoanDetailsCard {
         loanSubcategory: string;
         initialDeposit: number;
         loanAmount: number;
-        loanPeriod: number; // in months
+        loanPeriod: number;
         status: string;
-        createdAt: string; // ISO date string
-        updatedAt: string; // ISO date string
+        createdAt: string;
+        updatedAt: string;
         guarantors: Guarantors[];
         salarySheet: {
             url: string;

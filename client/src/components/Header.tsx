@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react'
 import { Button } from './ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from './ui/dropdown-menu'
+import { Avatar, AvatarFallback } from './ui/avatar'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu'
 import Link from 'next/link'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from "@/config/axiosConfig"

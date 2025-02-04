@@ -1,8 +1,7 @@
-import jwt, { decode } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import User from "../models/user.models.js"
 import { generateAccessandRefreshTokens } from "../utils/token.utils.js";
 
-// //generates access token on app start
 const isUserLoggedIn = async (req, res) => {
     const currentRefreshToken = req.cookies?.refreshToken;
     if (!currentRefreshToken) {
@@ -12,18 +11,14 @@ const isUserLoggedIn = async (req, res) => {
     }
     try {
         const decoded = jwt.verify(currentRefreshToken, process.env.REFRESH_TOKEN_SECRET)
-        console.log(decoded);
-        //check if the user exists in DB
         const user = await User.findById(decoded._id);
         if (!user) {
             return res.status(404).json({
                 message: "User not found!"
             })
         }
-        //generate new tokens if user found
         const { accessToken, refreshToken } = generateAccessandRefreshTokens(user);
         res
-            //Adding cookies
             .cookie("refreshToken", refreshToken, { httpOnly: true,
                 secure: process.env.STATUS === "development" ? false : true, 
                 maxAge: 24 * 60 * 60 * 1000, sameSite: process.env.STATUS === "development" ? 'Lax' : 'None' })
@@ -49,7 +44,6 @@ const isUserLoggedIn = async (req, res) => {
     }
 }
 
-// //authenticates user when accessing secure routes
 const authenticateUser = async (req, res) => {
     const { refreshToken } = req.cookies;
     console.log(refreshToken);
@@ -93,7 +87,6 @@ const authenticateUser = async (req, res) => {
     }
 }
 
-// //logout user
 const logoutUser = async (req, res) => {
     try {
         const { refreshToken } = req.cookies;

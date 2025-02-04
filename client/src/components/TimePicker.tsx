@@ -39,7 +39,6 @@ const TimePicker = ({ setSelectedTime, selectedTime, editAble, update }: TimePic
                     aria-label="Choose time"
                     className="w-[280px]"
                 />
-                {/* Display selected time */}
                 {<p className="mt-2 text-sm font-medium">Selected Time: {selectedTime}</p>}
             </div> : <div className="mb-4">
                 <label htmlFor="time" className="block text-sm font-medium mb-2">
@@ -52,13 +51,11 @@ const TimePicker = ({ setSelectedTime, selectedTime, editAble, update }: TimePic
                     aria-label="Choose time"
                     className="w-[280px]"
                     value={selectedTime}
-                    onChange={handleTimeChange} // Captures the selected time
+                    onChange={handleTimeChange}
                 />
                 {showText && <p className="text-sm text-red-500 mt-1">
                     Saylani Offices are open only from 9 am to 5 pm.
                 </p>}
-
-                {/* Display selected time */}
                 {selectedTime && <p className="mt-2 text-sm font-medium">Selected Time: {selectedTime}</p>}
             </div>}
         </>

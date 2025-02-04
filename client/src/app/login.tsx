@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux"
 import { setAccessToken } from "@/config/redux/reducers/tokenSlice"
 import { setUser } from "@/config/redux/reducers/userSlice"
 import { useRouter } from "next/navigation"
+
 export default function Login() {
     const router = useRouter();
     const [cnicNo, setCnicNo] = useState("");
@@ -30,7 +31,6 @@ export default function Login() {
                 cnicNo,
                 password
             })
-            console.log(data);
             toast("Welcome Back!", {
                 description: `You have successfully logged in. Enjoy your session!`,
                 action: {

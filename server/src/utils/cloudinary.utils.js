@@ -9,7 +9,7 @@ const uploadImageToCloudinary = async (buffer) => {
 
     try {
         if (!buffer) {
-            console.log("No buffer found.");
+            ("No buffer found.");
             return null;
         }
 
@@ -28,8 +28,6 @@ const uploadImageToCloudinary = async (buffer) => {
 
             stream.end(buffer);
         });
-
-        console.log("Upload successful:", uploadResult.url);
         return uploadResult;
     } catch (error) {
         console.error("Error in Cloudinary upload:", error);
@@ -45,7 +43,6 @@ const deleteImageFromCloudinary = async (publicId) => {
     });
     try {
         const result = await cloudinary.uploader.destroy(publicId);
-        console.log('Image deleted:', result);
     } catch (error) {
         console.error('Error deleting image:', error);
     }

@@ -1,7 +1,6 @@
 "use client"
 import { format } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
-
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -23,13 +22,11 @@ interface DatePickerProps {
 }
 
 export function DatePicker({ date, setDate,editAble,update }: DatePickerProps) {
-    const dispatch = useDispatch();
-    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const [showText, setShowText] = useState(false);
+    const dispatch = useDispatch();
     const handleDateSelect = (selectedDate: Date | undefined) => {
         if (!selectedDate) return;
         const day = selectedDate.getDay();
-        console.log(daysOfWeek[day]);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         if (selectedDate) {
@@ -105,7 +102,7 @@ export function DatePicker({ date, setDate,editAble,update }: DatePickerProps) {
                         required
                         id="calender"
                         mode="single"
-                        selected={date}  // Use undefined if no date is selected
+                        selected={date}
                         onSelect={handleDateSelect}
                         initialFocus
                     />

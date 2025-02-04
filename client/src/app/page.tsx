@@ -2,32 +2,14 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import axios from "@/config/axiosConfig"
-import Head from 'next/head';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { setCategoriesInRedux } from '@/config/redux/reducers/categorySlice';
-import { setLoadingState } from '@/config/redux/reducers/loadingSlice';
 import Loader from '@/components/Loader';
 import CategoryCard from '@/components/CategoryCard';
-
-interface tokenState {
-  token: {
-    accessToken: string,
-  }
-}
 interface isLoading {
   isLoading: {
     isLoading: boolean,
-  }
-}
-interface userState {
-  user: {
-    user: {
-      fullName: string,
-      _id: string,
-      cnicNo: string,
-      email: string
-    },
   }
 }
 interface SubCategory {
@@ -46,21 +28,13 @@ interface Category {
   __v: number;
 }
 const Home = () => {
-  const accessToken = useSelector((state: tokenState) => state.token.accessToken);
-  const user = useSelector((state: userState) => state.user.user);
   const isLoading = useSelector((state: isLoading) => state.isLoading.isLoading);
-  const [loading, setLoading] = useState(true);
-  const [textInput, setTextInput] = useState("");
-  const [commentText, setCommentText] = useState("");
   const [categories, setCategories] = useState([]);
   const dispatch = useDispatch();
-  const [currentPage, setCurrentPage] = useState(1);
   const [loadingVal, setLoadingVal] = useState(33);
   const router = useRouter()
-  const mediaRef = useRef<HTMLInputElement | null>(null);
-  const getAllCategories = async (page = 1) => {
+  const getAllCategories = async () => {
     setCategories([]);
-    setLoading(true)
     setLoadingVal(50);
     try {
       const { data } = await axios.get("/api/v1/categories");
@@ -68,8 +42,6 @@ const Home = () => {
       dispatch(setCategoriesInRedux(data));
     } catch (error) {
       console.log(error);
-    } finally {
-      setLoading(false)
     }
   }
   useEffect(() => {
@@ -83,7 +55,6 @@ const Home = () => {
   return (
     <>
       <div className="h-6 w-full"></div>
-      {/* Loading Spinner */}
       {isLoading ? <Loader loadingVal={loadingVal} /> : (
         <>
           <h1 className='text-2xl text-center'>What Saylani offers you</h1>

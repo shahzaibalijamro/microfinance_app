@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import Category from "../models/categorySchema.models.js";
 import Request from "../models/loanRequest.models.js";
 import User from "../models/user.models.js";
@@ -15,7 +14,6 @@ const addCategory = async (req, res) => {
             maxLoan,
             loanPeriod,
         });
-        // Send a success response
         res.status(201).json({
             success: true,
             message: 'Loan category added successfully!',
@@ -68,7 +66,6 @@ const approveOrDisapproveRequest = async (req, res) => {
             if (!approveRequest) {
                 return res.status(404).json(approveRequest)
             }
-            //still continue
             await notifyUser(request.userId.email, updateAppointment.appointmentDay, updateAppointment.appointmentTime, updateAppointment.location, "Approved")
             return res.status(200).json(approveRequest)
         }

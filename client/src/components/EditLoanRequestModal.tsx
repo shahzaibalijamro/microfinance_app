@@ -1,9 +1,7 @@
 import Image from 'next/image'
-import React, { ChangeEvent, FormEvent, RefObject } from 'react'
+import React, { FormEvent, RefObject } from 'react'
 import { Button } from './ui/button'
 import close from "@/assets/close.png";
-import { DatePicker } from './DatePicker';
-import TimePicker from './TimePicker';
 import { LoadingSpinner } from './LoadingSpinner';
 
 interface LoanDetails {
@@ -13,10 +11,10 @@ interface LoanDetails {
     loanSubcategory: string;
     initialDeposit: number;
     loanAmount: number;
-    loanPeriod: number; // in months
+    loanPeriod: number;
     status: string;
-    createdAt: string; // ISO date string
-    updatedAt: string; // ISO date string
+    createdAt: string;
+    updatedAt: string;
     guarantors: Guarantors[];
     salarySheet: {
         url: string;
@@ -68,7 +66,6 @@ interface EditLoanRequestModal {
     setIsEditModalOpen: (value: boolean) => void;
     loading: boolean;
     appointmentLocation: string;
-    setAppointmentLocation: (value: string) => void;
     setSelectedTime: (value: string) => void;
     selectedTime: string;
 }
@@ -76,7 +73,6 @@ interface EditLoanRequestModal {
 const EditLoanRequestModal = ({
     editLoanRequest,
     user,
-    setAppointmentLocation,
     loading,
     salarySheet,
     setIsEditModalOpen,
@@ -104,7 +100,6 @@ const EditLoanRequestModal = ({
                             <h3 className="text-lg font-semibold mb-3">Personal Information</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <input
-                                    // value={user?.address}
                                     defaultValue={user?.address}
                                     onChange={(e) => setAddress(e.target.value)}
                                     type="text"
@@ -205,11 +200,8 @@ const EditLoanRequestModal = ({
                                 </div>
                             </div>
                         </div>
-                        {/* Statement and Salary Sheet Section */}
                         <div className="mb-6">
                             <h3 className="text-lg font-semibold mb-3">Statement and Salary Sheet</h3>
-
-                            {/* Salary Sheet Input */}
                             <div className="mb-4">
                                 <label htmlFor="salarySheet" className="block text-sm font-medium mb-2">
                                     Update Salary Sheet (Leave as it is, If you don't want to update)
@@ -226,8 +218,6 @@ const EditLoanRequestModal = ({
                                 />
                                 <p className="text-sm text-gray-500 mt-1">Upload your latest salary slip or salary certificate (PDF, DOC, JPG, PNG).</p>
                             </div>
-
-                            {/* Bank Statement Input */}
                             <div className="mb-4">
                                 <label htmlFor="bankStatement" className="block text-sm font-medium mb-2">
                                     Update Bank Statement (Leave as it is, If you don't want to update)
@@ -245,7 +235,6 @@ const EditLoanRequestModal = ({
                                 <p className="text-sm text-gray-500 mt-1">Upload your latest bank statement (PDF, DOC, JPG, PNG).</p>
                             </div>
                         </div>
-                        {/* Submit Button */}
                         <Button
                             type="submit"
                             className="w-full bg-[#0673be] text-white py-2 px-4 rounded-md hover:bg-[#0673be] focus:ring focus:ring-blue-300"
