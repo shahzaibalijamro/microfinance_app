@@ -172,14 +172,14 @@ const ViewMoreModal = ({ setIsviewMoreModalOpen, loading, appointmentLocation, d
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <input
                                         readOnly
-                                        defaultValue={request.userId.address}
+                                        defaultValue={request?.userId?.address}
                                         type="text"
                                         placeholder="Address"
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
                                     />
                                     <input
                                         readOnly
-                                        defaultValue={request.userId.mobileNo}
+                                        defaultValue={request?.userId?.mobileNo}
                                         type="number"
                                         placeholder="Phone Number"
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
@@ -192,28 +192,28 @@ const ViewMoreModal = ({ setIsviewMoreModalOpen, loading, appointmentLocation, d
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <input
                                         readOnly
-                                            defaultValue={request.guarantors[0].name}
+                                            defaultValue={request?.guarantors[0]?.name}
                                             type="text"
                                             placeholder="Guarantor 1 Name"
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
                                         />
                                         <input
                                         readOnly
-                                            defaultValue={request.guarantors[0].email}
+                                            defaultValue={request?.guarantors[0]?.email}
                                             type="email"
                                             placeholder="Guarantor 1 Email"
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
                                         />
                                         <input
                                         readOnly
-                                            defaultValue={request.guarantors[0].location}
+                                            defaultValue={request?.guarantors[0]?.location}
                                             type="text"
                                             placeholder="Guarantor 1 Location"
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
                                         />
                                         <input
                                         readOnly
-                                            defaultValue={request.guarantors[0].cnic}
+                                            defaultValue={request?.guarantors[0]?.cnic}
                                             type="number"
                                             placeholder="Guarantor 1 CNIC"
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
@@ -222,21 +222,21 @@ const ViewMoreModal = ({ setIsviewMoreModalOpen, loading, appointmentLocation, d
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <input
                                         readOnly
-                                            defaultValue={request.guarantors[1].name}
+                                            defaultValue={request?.guarantors[1]?.name}
                                             type="text"
                                             placeholder="Guarantor 2 Name"
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
                                         />
                                         <input
                                         readOnly
-                                            defaultValue={request.guarantors[1].email}
+                                            defaultValue={request?.guarantors[1]?.email}
                                             type="email"
                                             placeholder="Guarantor 2 Email"
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
                                         />
                                         <input
                                         readOnly
-                                            defaultValue={request.guarantors[1].location}
+                                            defaultValue={request?.guarantors[1]?.location}
                                             type="text"
                                             placeholder="Guarantor 2 Location"
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
@@ -244,7 +244,7 @@ const ViewMoreModal = ({ setIsviewMoreModalOpen, loading, appointmentLocation, d
                                         <input
                                         readOnly
                                             required
-                                            defaultValue={request.guarantors[1].cnic}
+                                            defaultValue={request?.guarantors[1]?.cnic}
                                             type="text"
                                             placeholder="Guarantor 2 CNIC"
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-200 focus:outline-none"
@@ -260,13 +260,13 @@ const ViewMoreModal = ({ setIsviewMoreModalOpen, loading, appointmentLocation, d
                                         <label htmlFor="salarySheet" className="block text-sm font-medium mb-2">
                                             Salary Sheet
                                         </label>
-                                        <Image src={request.salarySheet.url} alt="salary sheet" width={100} height={100} />
+                                        <Image src={request?.salarySheet?.url} alt="salary sheet" width={100} height={100} />
                                     </div>
                                     <div className="mb-4 flex flex-col justify-start">
                                         <label htmlFor="Bank Statement" className="block text-sm font-medium mb-2">
                                             Bank Statement
                                         </label>
-                                        <Image src={request.bankStatement.url} alt="Bank Statement" width={100} height={100} />
+                                        <Image src={request?.bankStatement?.url} alt="Bank Statement" width={100} height={100} />
                                     </div>
                                 </div>
                                 {/* Salary Sheet Input */}

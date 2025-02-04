@@ -106,4 +106,20 @@ const filterRequestsByStatus = async (req,res) => {
         })
     }
 }
+
+const filterRequestsByCnic = async (req,res) => {
+    const {cnic} = req.params;
+    try {
+        const requests = await Request.find({status}).sort({ createdAt: -1 }).populate([{ path: 'userId', select: '-password -role -isPasswordChanged' }]);
+        if (requests.length === 0) return res.status(200).json({
+            message: "You're all caught up!"
+        })
+        return res.status(200).json(requests);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Something went wrong!"
+        })
+    }
+}
 export { addCategory, getAllLoanRequests, approveOrDisapproveRequest,filterRequestsByStatus }

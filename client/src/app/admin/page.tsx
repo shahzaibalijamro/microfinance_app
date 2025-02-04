@@ -56,6 +56,7 @@ const page = () => {
     const accessToken = useSelector(
         (state: TokenState) => state.token.accessToken
     );
+    const [singleUserData,setSingleUserData] = useState<LoanApplication | undefined>(undefined)
     const [cnicNumber, setCnicNumber] = useState("")
     const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
     const [mobileNo, setMobileNo] = useState("");
@@ -102,8 +103,8 @@ const page = () => {
         }
     }
     const debouncedSearch = useCallback(
-        debounce((searchTerm: string) => {
-            console.log('Searching for:', searchTerm);
+        debounce((cnic: string) => {
+            console.log('Searching for:', cnic);
         }, 500),
         []
     );
@@ -162,6 +163,7 @@ const page = () => {
             setDate(formattedDate);
             setSelectedTime(data.appointmentTime)
             setIsviewMoreModalOpen(true)
+            setSingleUserData(loanRequests[index])
             setLoading(false);
         } catch (error) {
             console.log(error);
@@ -230,10 +232,10 @@ const page = () => {
                 {loanRequests.map((request, index) => {
                     return <div key={request._id}>
                         <LoanDetailsCard request={request} index={index} handleViewMoreModal={handleViewMoreModal} approveOrDisapproveRequest={approveOrDisapproveRequest} setIsEditModalOpen={setIsEditModalOpen} />
-                        {isviewMoreModalOpen &&
-                            <ViewMoreModal appointmentLocation={appointmentLocation} date={date} loading={loading} selectedTime={selectedTime} setIsviewMoreModalOpen={setIsviewMoreModalOpen} request={request} />}
                     </div>
                 })}
+                {isviewMoreModalOpen &&
+                    <ViewMoreModal appointmentLocation={appointmentLocation} date={date} loading={loading} selectedTime={selectedTime} setIsviewMoreModalOpen={setIsviewMoreModalOpen} request={singleUserData} />}
             </> : <Loader loadingVal={loadingVal} />}
         </div>
     )
