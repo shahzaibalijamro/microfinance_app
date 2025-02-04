@@ -1,4 +1,5 @@
 "use client";
+
 import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "@/config/axiosConfig";
@@ -13,6 +14,7 @@ import LoanDetailsCard from "@/components/LoanDetailsCard";
 import EditLoanRequestModal from "@/components/EditLoanRequestModal";
 import TokenSlip from "@/components/TokenSlip";
 import { setAppointmentInRedux } from "@/config/redux/reducers/appointmentSlice";
+
 // TypeScript Interfaces
 interface UserState {
     user: {
@@ -54,10 +56,10 @@ interface LoanDetails {
     loanSubcategory: string;
     initialDeposit: number;
     loanAmount: number;
-    loanPeriod: number; // in months
+    loanPeriod: number;
     status: string;
-    createdAt: string; // ISO date string
-    updatedAt: string; // ISO date string
+    createdAt: string;
+    updatedAt: string;
     guarantors: Guarantors[];
     salarySheet: {
         url: string;
@@ -85,8 +87,8 @@ interface Appointment {
     location: string;
     tokenNumber: number;
 }
-// Component
-const Page = () => {
+
+const Dashboard = () => {
     const isLoading = useSelector((state: isLoading) => state.isLoading.isLoading);
     const accessToken = useSelector(
         (state: TokenState) => state.token.accessToken
@@ -167,7 +169,6 @@ const Page = () => {
                     'Authorization': `Bearer ${accessToken}`
                 }
             })
-            console.log(data);
             setIsPasswordChanged(data.isPasswordChanged);
             dispatch(setUser({ user: data }));
             return toast("Password updated!", {
@@ -273,12 +274,6 @@ const Page = () => {
                 cnic: g2Cnic
             }
         ];
-        console.log(mobileNo);
-        console.log(guarantors);
-        console.log(address);
-        console.log(date?.toLocaleDateString());
-        console.log(selectedTime);
-        console.log(appointmentLocation);
         if (!appointmentLocation) {
             return toast("No location selected!", {
                 description: "Kindly select an appointment location",
@@ -302,7 +297,6 @@ const Page = () => {
             setLoanDetails(data.loanRequest);
             dispatch(setUser({ user: data.theUser }))
             setAppointment(data.appointment);
-            console.log(data);
         } catch (error) {
             console.log(error);
         } finally {
@@ -359,7 +353,6 @@ const Page = () => {
             })
             setLoanDetails(data.loanRequest);
             dispatch(setUser({ user: data.theUser }));
-            console.log(data);
         } catch (error) {
             console.log(error);
         } finally {
@@ -375,12 +368,10 @@ const Page = () => {
         })
         setLoading(true);
         dispatch(setAppointmentInRedux(data));
-        console.log(data);
         setAppointmentLocation(data.location);
         const inputDate = data.appointmentDay;
         const [month, day, year] = inputDate.split("/").map(Number);
         const formattedDate = new Date(year, month - 1, day);
-        console.log(formattedDate); 
         setDate(formattedDate);
         setSelectedTime(data.appointmentTime)
         setIsviewMoreModalOpen(true)
@@ -401,4 +392,4 @@ const Page = () => {
     );
 };
 
-export default Page;
+export default Dashboard;

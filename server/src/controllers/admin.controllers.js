@@ -63,12 +63,13 @@ const approveOrDisapproveRequest = async (req, res) => {
                 status: "Approved"
             }, { new: true });
             const updateAppointment = await Appointment.findOneAndUpdate({
-                loanRequestId: request._id},{isCompleted: true},{new:true});
+                loanRequestId: request._id
+            }, { isCompleted: true }, { new: true });
             if (!approveRequest) {
                 return res.status(404).json(approveRequest)
             }
             //still continue
-            await notifyUser(request.userId.email,updateAppointment.appointmentDay,updateAppointment.appointmentTime,updateAppointment.location,"Approved")
+            await notifyUser(request.userId.email, updateAppointment.appointmentDay, updateAppointment.appointmentTime, updateAppointment.location, "Approved")
             return res.status(200).json(approveRequest)
         }
         if (text === "Reject") {
@@ -78,7 +79,7 @@ const approveOrDisapproveRequest = async (req, res) => {
             if (!rejectRequest) {
                 return res.status(404).json(rejectRequest)
             }
-            await notifyUser(request.userId.email,null,null,null,"Rejected")
+            await notifyUser(request.userId.email, null, null, null, "Rejected")
             return res.status(200).json(rejectRequest)
         }
     } catch (error) {
@@ -89,13 +90,13 @@ const approveOrDisapproveRequest = async (req, res) => {
     }
 }
 
-const filterRequestsByStatus = async (req,res) => {
-    const {status} = req.params;
+const filterRequestsByStatus = async (req, res) => {
+    const { status } = req.params;
     const page = req.query?.page || 1;
     const limit = req.query?.limit || 10;
     const skip = (+page - 1) * +limit;
     try {
-        const requests = await Request.find({status}).sort({ createdAt: -1 }).skip(skip).limit(limit).populate([{ path: 'userId', select: '-password -role -isPasswordChanged' }]);
+        const requests = await Request.find({ status }).sort({ createdAt: -1 }).skip(skip).limit(limit).populate([{ path: 'userId', select: '-password -role -isPasswordChanged' }]);
         if (requests.length === 0) return res.status(200).json({
             message: "You're all caught up!"
         })
@@ -108,11 +109,25 @@ const filterRequestsByStatus = async (req,res) => {
     }
 }
 
-const filterRequestsByCnic = async (req,res) => {
-    const {cnic} = req.params;
+const filterRequestsByCnic = async (req, res) => {
+    const { cnic } = req.params;
     try {
-        const request = await User.find({ cnicNo: { $regex: `^${cnic}`, $options: "i" } });
-        return res.status(200).json(request);
+        const request = await User.find(
+            { cnicNo: { $regex: `^${cnic}`, $options: "i" } }
+        ).populate("loanRequest").lean();
+        if (request.length === 0) {
+            return res.status(404).json({
+                message: "No requests found!"
+            })
+        }
+        const filteredArray = request.filter((item) => item.role !== "admin")
+        const requestArray = filteredArray.map(({loanRequest,...rest}) => loanRequest);
+        const userArray = request.map(({loanRequest,...rest}) => rest);
+        const finalArray = requestArray.map((item,index) => {
+            item.userId = userArray[index];
+            return item
+        })
+        return res.status(200).json(finalArray);
     } catch (error) {
         console.log(error);
         return res.status(500).json({
@@ -120,4 +135,4 @@ const filterRequestsByCnic = async (req,res) => {
         })
     }
 }
-export { addCategory, getAllLoanRequests, approveOrDisapproveRequest,filterRequestsByStatus,filterRequestsByCnic }
+export { addCategory, getAllLoanRequests, approveOrDisapproveRequest, filterRequestsByStatus, filterRequestsByCnic }

@@ -70,19 +70,24 @@ const Page = ({ params, }: { params: Promise<{ id: string }> }) => {
     }
     return (
         <>
-            {loading ? <Loader loadingVal={loadingVal}/> : !doesCategoryExist ? <PageNotFound/> : (
+            {loading ? <Loader loadingVal={loadingVal} /> : !doesCategoryExist ? <PageNotFound /> : (
                 <div className="max-w-[1200px] px-3 w-full mx-auto">
                     <div className="h-6 w-full"></div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         {currentCategory?.subcategories && currentCategory?.subcategories?.length > 0 ? (
                             currentCategory.subcategories.map((subcategory: SubCategory) => (
-                                <SubCategoryCard goToLoanCalculator={goToLoanCalculator} subcategory={subcategory}/>
+                                <SubCategoryCard goToLoanCalculator={goToLoanCalculator} subcategory={subcategory} />
                             ))
                         ) : (
-                            <div className="flex justify-center items-center my-4">
-                                <h1 className="text-lg font-semibold text-gray-600">
-                                    No categories found!
-                                </h1>
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-4 py-12 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+                                <div className="mx-auto space-y-6 text-center">
+                                    <div className="space-y-3">
+                                        <h1 className="text-4xl font-bold tracking-tighter text-[#0673be] sm:text-5xl transition-transform hover:scale-110">
+                                            404
+                                        </h1>
+                                        <p className="text-gray-500">Category not found!</p>
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>

@@ -1,14 +1,16 @@
 "use client"
-import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react'
+import React, { ChangeEvent, useCallback, useEffect, useState } from 'react'
 import axios from "@/config/axiosConfig"
 import { useDispatch, useSelector } from 'react-redux';
 import LoanDetailsCard from '@/components/LoanDetailsCard';
 import { setAppointmentInRedux } from '@/config/redux/reducers/appointmentSlice';
-import Loader from '@/components/Loader';
 import ViewMoreModal from '@/components/ViewMoreModal';
 import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/sonner';
 import { debounce } from 'lodash';
+import { Progress } from '@/components/ui/progress';
+
+// TypeScript Interfaces
 interface TokenState {
     token: {
         accessToken: string;
@@ -56,30 +58,16 @@ const page = () => {
     const accessToken = useSelector(
         (state: TokenState) => state.token.accessToken
     );
-    const [singleUserData,setSingleUserData] = useState<LoanApplication | undefined>(undefined)
-    const [cnicNumber, setCnicNumber] = useState("")
-    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
-    const [mobileNo, setMobileNo] = useState("");
-    const [g1Name, setG1Name] = useState("");
-    const [g1Email, setG1Email] = useState("");
-    const [g1Location, setG1Location] = useState("");
-    const [g1Cnic, setG1Cnic] = useState("");
-    const [g2Name, setG2Name] = useState("");
-    const [g2Email, setG2Email] = useState("");
-    const [g2Location, setG2Location] = useState("");
-    const [g2Cnic, setG2Cnic] = useState("");
+    const [singleUserData, setSingleUserData] = useState<LoanApplication | undefined>(undefined)
+    const [cnicNumber, setCnicNumber] = useState("");
     const [appointmentLocation, setAppointmentLocation] = useState<string>("");
     const [selectedTime, setSelectedTime] = useState("");
-    const [isLoading, setIsLoading] = useState(true);
     const [loading, setLoading] = useState(false)
-    const [loadingVal, setLoadingVal] = useState(30)
+    const [loadingVal, setLoadingVal] = useState(30);
+    const [notFound, setNotFound] = useState(false);
     const [loanRequests, setLoanRequests] = useState<LoanApplication[]>([]);
-    const [isviewMoreModalOpen, setIsviewMoreModalOpen] = useState(false)
-    const salarySheet = useRef<HTMLInputElement>(null);
-    const [hour, setHour] = useState<number>(0);
+    const [isviewMoreModalOpen, setIsviewMoreModalOpen] = useState(false);
     const [date, setDate] = useState<Date | undefined>();
-    const [address, setAddress] = useState("");
-    const bankStatement = useRef<HTMLInputElement>(null);
     const dispatch = useDispatch();
     useEffect(() => {
         if (accessToken) {
@@ -96,25 +84,29 @@ const page = () => {
             })
             setLoadingVal(99)
             setLoanRequests(data);
-            console.log(data);
-            setIsLoading(false);
-        } catch (error) {
+        } catch (error: any) {
             console.log(error);
         }
     }
     const debouncedSearch = useCallback(
-        debounce(async(cnic: string) => {
-            if (cnic.length < 6) return;
-            console.log('Searching for:', cnic);
+        debounce(async (cnic: string) => {
+            if (cnic.length < 3) {
+                return await getAllLoanRequests()
+            };
             try {
-                const {data} = await axios.get(`/api/v1/search/${cnic}`,{
-                    headers:{
+                const { data } = await axios.get(`/api/v1/search/${cnic}`, {
+                    headers: {
                         'Authorization': `Bearer ${accessToken}`
                     }
                 })
-                console.log(data);
-            } catch (error) {
+                setLoanRequests(data);
+            } catch (error: any) {
                 console.log(error);
+                const errorMsg = error?.response?.data?.message;
+                if (errorMsg === "No requests found!") {
+                    setLoanRequests([]);
+                    setNotFound(true);
+                }
             }
         }, 700),
         [accessToken]
@@ -131,8 +123,6 @@ const page = () => {
     }, [debouncedSearch]);
     const filterByStatus = async (event: ChangeEvent<HTMLSelectElement>) => {
         const status = event.target.value;
-        console.log(status);
-
         try {
             if (status === "All requests") {
                 return await getAllLoanRequests()
@@ -142,7 +132,6 @@ const page = () => {
                     'Authorization': `Bearer ${accessToken}`
                 }
             })
-            console.log(data);
             if (data.message === "You're all caught up!") {
                 await getAllLoanRequests();
                 return toast("No such requests found!", {
@@ -156,7 +145,6 @@ const page = () => {
         }
     }
     const handleViewMoreModal = async (userId: string, index: number) => {
-        console.log(userId);
         setLoading(true);
         try {
             const { data } = await axios(`/api/v1/appoint/${userId}`, {
@@ -165,12 +153,10 @@ const page = () => {
                 }
             })
             dispatch(setAppointmentInRedux(data));
-            console.log(data);
             setAppointmentLocation(data.location);
             const inputDate = data.appointmentDay;
             const [month, day, year] = inputDate.split("/").map(Number);
             const formattedDate = new Date(year, month - 1, day);
-            console.log(formattedDate);
             setDate(formattedDate);
             setSelectedTime(data.appointmentTime)
             setIsviewMoreModalOpen(true)
@@ -198,7 +184,6 @@ const page = () => {
                     action: { label: "Ok", onClick: () => console.log("Ok clicked") },
                 });
             }
-            console.log(data);
             let updatedRequest = data;
             updatedRequest.userId = request.userId;
             loanRequests[0] = updatedRequest;
@@ -210,45 +195,56 @@ const page = () => {
     return (
         <div className='mx-3'>
             <Toaster />
-            {loanRequests.length > 0 ? <>
-                <div className="w-full bg-white shadow-md rounded-lg p-3 flex flex-col sm:flex-row gap-2 border max-w-[1200px] relative mx-auto mt-6">
-                    <input
-                        value={cnicNumber}
-                        onChange={searchByCnicNumber}
-                        className='px-3 py-2 border-slate-200 border rounded-md w-full focus-visible:outline-slate-300'
-                        type="number"
-                        placeholder='Search by token number'
-                    />
-                    <div className='sm:max-w-[300px] max-w-full top-[2px] relative w-full'>
-                        <select
-                            onChange={filterByStatus}
-                            className="px-3 focus-visible:outline-none w-full py-2 border rounded-md focus:ring focus:ring-slate-300"
-                        >
-                            <option value="All requests">All requests</option>
-                            <option value={'Approved'}>
-                                Approved
-                            </option>
-                            <option value={'Rejected'}>
-                                Rejected
-                            </option>
-                            <option value={'Under Review'}>
-                                Under Review
-                            </option>
-                            <option value={'Documents Pending'}>
-                                Documents Pending
-                            </option>
-                        </select>
-                    </div>
+            <div className="w-full bg-white shadow-md rounded-lg p-3 flex flex-col sm:flex-row gap-2 border max-w-[1200px] relative mx-auto mt-6">
+                <input
+                    value={cnicNumber}
+                    onChange={searchByCnicNumber}
+                    className='px-3 py-2 border-slate-200 border rounded-md w-full focus-visible:outline-slate-300'
+                    type="number"
+                    placeholder='Search by CNIC Number'
+                />
+                <div className='sm:max-w-[300px] max-w-full top-[2px] relative w-full'>
+                    <select
+                        onChange={filterByStatus}
+                        className="px-3 focus-visible:outline-none w-full py-2 border rounded-md focus:ring focus:ring-slate-300"
+                    >
+                        <option value="All requests">All requests</option>
+                        <option value={'Approved'}>
+                            Approved
+                        </option>
+                        <option value={'Rejected'}>
+                            Rejected
+                        </option>
+                        <option value={'Under Review'}>
+                            Under Review
+                        </option>
+                        <option value={'Documents Pending'}>
+                            Documents Pending
+                        </option>
+                    </select>
                 </div>
+            </div>
+            {loanRequests.length > 0 ? <>
                 {loanRequests.map((request, index) => {
                     return <div key={request._id}>
-                        <LoanDetailsCard request={request} index={index} handleViewMoreModal={handleViewMoreModal} approveOrDisapproveRequest={approveOrDisapproveRequest} setIsEditModalOpen={setIsEditModalOpen} />
+                        <LoanDetailsCard request={request} index={index} handleViewMoreModal={handleViewMoreModal} approveOrDisapproveRequest={approveOrDisapproveRequest} />
                     </div>
                 })}
                 {isviewMoreModalOpen &&
                     <ViewMoreModal appointmentLocation={appointmentLocation} date={date} loading={loading} selectedTime={selectedTime} setIsviewMoreModalOpen={setIsviewMoreModalOpen} request={singleUserData} />}
-            </> : <Loader loadingVal={loadingVal} />}
-        </div>
+            </> : notFound ? <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-4 py-12 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+                <div className="mx-auto space-y-6 text-center">
+                    <div className="space-y-3">
+                        <h1 className="text-4xl font-bold tracking-tighter text-[#0673be] sm:text-5xl transition-transform hover:scale-110">
+                            404
+                        </h1>
+                        <p className="text-gray-500">No request found of such user!</p>
+                    </div>
+                </div>
+            </div> : <div className="max-w-[200px] w-full px-4 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <Progress value={loadingVal} />
+        </div>}
+        </div >
     )
 }
 

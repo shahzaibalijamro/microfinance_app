@@ -34,7 +34,6 @@ interface SelectedData {
 }
 const LoanCalculate = () => {
     const selectedData = useSelector((state: SelectedData) => state.loanSlice.loanSlice);
-    console.log(selectedData);
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [loadingVal, setLoadingVal] = useState<number>(33);
@@ -47,7 +46,6 @@ const LoanCalculate = () => {
     const [isRegistered, setIsRegistered] = useState(false);
     const [loanBreakdown, setLoanBreakdown] = useState<LoanBreakdown | null>(null);
     const [amount, setAmount] = useState<number | null>(null);
-    const router = useRouter()
     const [cnic, setCnic] = useState("");
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
@@ -79,7 +77,6 @@ const LoanCalculate = () => {
                 fullName: name, email, cnicNo: cnic, loanCategory: selectedCategory, loanSubcategory: selectedSubCategory, initialDeposit, loanAmount: amount,
                 loanPeriod
             })
-            console.log(data);
             setIsModalOpen(false);
             setTimeout(() => {
                 setIsRegistered(true);
@@ -109,19 +106,12 @@ const LoanCalculate = () => {
     };
     useEffect(() => {
         if (selectedData && categories.length > 0) {
-            console.log("UESE");
-            
             const selectedOption = selectedData.category;
             setSelectedCategory(selectedOption);
             setSelectedSubCategory(selectedData.subCategory);
-            console.log(categories);
-            console.log(selectedOption);
-            
             const selectedCategoryObject = categories.find(
                 (category) => category.name === selectedOption
             );
-            console.log(selectedCategory);
-            
             setCurrentCategory(selectedCategoryObject || null);
         }
     }, [selectedData,categories])

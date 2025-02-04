@@ -32,7 +32,7 @@ interface LoanDetailsCard {
         mobileNo: string
     };
     setIsModalOpen?: (value: boolean) => void;
-    setIsEditModalOpen: (value: boolean) => void;
+    setIsEditModalOpen?: (value: boolean) => void;
     handleViewMoreModal: (userId: string, index: number) => Promise<void>;
     approveOrDisapproveRequest?: (request: LoanApplication, text: string, index: number) => Promise<void>;
     request?: LoanApplication;
@@ -168,7 +168,7 @@ const LoanDetailsCard = ({ loanDetails, request, handleViewMoreModal, setIsModal
                         Add Guarantor Information
                     </button>
                 </div>}
-                {loanDetails.guarantors.length > 0 && <div className="w-full flex justify-center sm:flex-row flex-col gap-y-3 gap-x-2 items-center">
+                {setIsEditModalOpen && loanDetails.guarantors.length > 0 && <div className="w-full flex justify-center sm:flex-row flex-col gap-y-3 gap-x-2 items-center">
                     <button onClick={() => handleViewMoreModal("", 0)} className="mt-auto w-full bg-[#0971c0] text-white py-2 px-4 rounded-lg hover:bg-[#0971c0d9] transition-all">
                         View full request
                     </button>
