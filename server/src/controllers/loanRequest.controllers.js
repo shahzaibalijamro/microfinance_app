@@ -105,7 +105,6 @@ const editLoanRequest = async (req, res) => {
             return res.status(401).json({ message: "You are not authorized to update this loan request!" });
         }
         if (salarySheet) {
-            console.log("salarySheet", salarySheet);
             try {
                 const [newSalarySheet] = await Promise.all([
                     uploadImageToCloudinary(salarySheet.buffer),
@@ -118,7 +117,6 @@ const editLoanRequest = async (req, res) => {
             }
         }
         if (bankStatement) {
-            console.log("bankStatement", bankStatement);
             try {
                 const [newBankStatement] = await Promise.all([
                     uploadImageToCloudinary(bankStatement.buffer),
@@ -131,7 +129,6 @@ const editLoanRequest = async (req, res) => {
             }
         }
         if (guarantors) {
-            console.log("guarantors", guarantors);
             loanRequest.guarantors = JSON.parse(guarantors);
         }
         loanRequest.status = "Under Review";

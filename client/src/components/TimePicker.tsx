@@ -18,7 +18,6 @@ const TimePicker = ({ setSelectedTime, selectedTime, editAble, update }: TimePic
             setSelectedTime(event.target.value);
         }
         const time = Number(event.target.value[0] + event.target.value[1] + event.target.value[3] + event.target.value[4]);
-        console.log(time);
         if (time < 900 || time > 1700) {
             setShowText(true)
             dispatch(setTime(false));

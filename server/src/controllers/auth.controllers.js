@@ -46,7 +46,6 @@ const isUserLoggedIn = async (req, res) => {
 
 const authenticateUser = async (req, res) => {
     const { refreshToken } = req.cookies;
-    console.log(refreshToken);
     if (!refreshToken) {
         return res.status(401).json({
             message: "Refresh token is required! Please log in again."

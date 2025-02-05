@@ -128,7 +128,6 @@ const loginUser = async function (req, res) {
     }
     try {
         const user = await User.findOne({ cnicNo:cnicNo });
-        console.log(user,password);
         if (!user) return res.status(404).json({
             message: "User does not exist!"
         })
