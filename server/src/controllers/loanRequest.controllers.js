@@ -41,15 +41,12 @@ const updateLoanRequest = async (req, res) => {
         if (loanRequest.userId.toString() !== user._id) {
             return res.status(401).json({ message: "Unauthorized to update this loan request!" });
         }
-        const [salarySheet, bankStatement] = await Promise.all([
-            uploadImageToCloudinary(req.files["salarySheet"][0].buffer),
-            uploadImageToCloudinary(req.files["bankStatement"][0].buffer),
-        ]);
-
+        const salarySheet = await uploadImageToCloudinary(req.files["salarySheet"][0].buffer);
+        const bankStatement = await uploadImageToCloudinary(req.files["bankStatement"][0].buffer);
         if (!salarySheet || !bankStatement) {
             return res.status(500).json({ message: "Could not upload media!" });
         }
-        const tokenNumber = await Request.countDocuments({ status: "Documents Pending" });
+        const tokenNumber = await Request.countDocuments({ status: { $ne: "Documents Pending" } });
         const session = await mongoose.startSession();
         session.startTransaction();
 
