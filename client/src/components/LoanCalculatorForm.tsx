@@ -52,7 +52,7 @@ const LoanCalculatorForm = ({
 }:LoanCalculatorForm) => {
     return (
         <div className="w-full">
-            <div className="bg-white mx-auto p-6 rounded-lg shadow-lg max-w-lg w-full">
+            <div className="bg-white sm:mx-auto mx-[8px] mx- p-6 rounded-lg shadow-lg max-w-lg w-full">
                 <h1 className="text-2xl font-bold text-center mb-6">Loan Calculator</h1>
                 <form className="space-y-4">
                     <div>

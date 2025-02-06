@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { setCategoriesInRedux } from '@/config/redux/reducers/categorySlice';
 import Loader from '@/components/Loader';
 import CategoryCard from '@/components/CategoryCard';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 interface isLoading {
   isLoading: {
     isLoading: boolean,
@@ -66,8 +67,8 @@ const Home = () => {
                   <CategoryCard key={category._id} category={category} goToSubCategory={goToSubCategory} />
                 ))
               ) : (
-                <div className="flex justify-center items-center my-4">
-                  <h1 className="text-lg font-semibold text-gray-600">No categories found!</h1>
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[200px] w-full my-4">
+                  <LoadingSpinner className='text-center'/>
                 </div>
               )}
             </div>
